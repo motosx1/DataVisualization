@@ -43,3 +43,14 @@ rect.frame {
     font-weight: bold;
     fill: red;
 }
+
+.featureFont {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 20px;
+    color: red;
+}
+
+.unselectedFont {
+    color: black;
+}

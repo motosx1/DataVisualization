@@ -6,13 +6,9 @@ var margin = {top: 20, right: 40, bottom: 30, left: 40};
 var width = viewWidth - margin.left - margin.right - 50;
 var height = viewHeight - margin.top - margin.bottom - 50;
 
-/* Define some offsets */
-var xOffset = 15;
-
 // get the data
 var boats = boat_data.boats;
 
-var points;
 
 /* Define a paading of 20px */
 var padding = 20;
@@ -53,15 +49,15 @@ function getDomainAndFeatureNr(data, excludedFeatures) {
 	return [domain, featureNames, featureNumber];
 }
 
-function drawScatterplot(data, excludedFeatures = []) {
+function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 	/* remove what was previously in this SVG */
 	d3.select("#plotSVG").remove();
 
 	/* Get some info on the data */
 	var res = getDomainAndFeatureNr(data, excludedFeatures);
-	var domains = res[0],
-		featureNames = res[1],
-		featureNumber = res[2];
+	var domains = res[0];
+	var featureNames = getCommonSet(res[1], selectedFeatures);
+    var featureNumber = res[2] < selectedFeatures.length ? res[2] : selectedFeatures.length;
 
     /* Create a brush */
     var brush = d3.brush()
@@ -76,9 +72,13 @@ function drawScatterplot(data, excludedFeatures = []) {
 
     var distanceToBottom = scatterPlotSize * featureNumber;
 
+    // leftAxis.tickSize(-distanceToBottom);
+    // bottomAxis.tickSize(-distanceToBottom);
+
     /* Start adding elements */
     var svg = d3
-        .select("svg")
+		.select("#vis")
+        .append("svg")
 		.attr("id", "plotSVG")
         .attr("width", distanceToBottom + padding)
         .attr("height", distanceToBottom + padding)
@@ -231,18 +231,58 @@ function resize() {
   drawScatterplot(boats);
 }
 
-function changedSelect() {
-	var selectionElements = document.getElementsByClassName("select-item");
+function getCommonSet(setA, setB) {
+	var finalSet = [];
 
-	x = selectionElements[0].value;
-	y = selectionElements[1].value;
-	c = selectionElements[2].value;
+	setA.sort();
+	setB.sort();
 
-	console.log(x);
-	console.log(y);
-	console.log(c);
+	for (var indexA = 0, indexB = 0; indexA < setA.length && indexB < setA.length; ) {
+		if (setA[indexA] === setB[indexB]) {
+            finalSet.push(setA[indexA])
+            ++indexA;
+            ++indexB;
+        } else if (setA[indexA] < setB[indexB])
+        	++indexA;
+		else
+			++indexB;
+	}
 
-    //rearrangePoints(x, y, c);
+	return finalSet;
 }
 
-drawScatterplot(boats);
+var totalFeatures = d3.keys(boats[0]); // ["a", "m", "u", "v", "x", "y"];
+
+$(function() {
+
+	for (var i = 0; i < totalFeatures.length; ++i) {
+		var newElement = "<li onclick='elementSelected(this)' value='" + totalFeatures[i] + "' class = 'featureFont'>" + totalFeatures[i] + "</li>";
+
+		$("#features").append(newElement);
+	}
+
+    console.log(totalFeatures);
+
+    drawScatterplot(boats, totalFeatures);
+});
+
+function elementSelected(element) {
+	var value = element.getAttribute("value");
+    var index = totalFeatures.indexOf(value);
+
+	console.log(value);
+
+	if (index >= 0) {
+        totalFeatures.splice(index, 1);
+    	// element.setAttribute("style", "color: black;");
+		$(element).addClass("unselectedFont");
+	} else {
+        totalFeatures.push(value);
+    	// element.removeAttribute("style");
+        $(element).removeClass("unselectedFont");
+	}
+
+	console.log(totalFeatures);
+
+    drawScatterplot(boats, totalFeatures);
+}
