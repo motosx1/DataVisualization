@@ -1,6 +1,6 @@
 var viewWidth = window.innerWidth;
 var viewHeight = window.innerHeight;
-d3.select(window).on("resize", resize);
+// d3.select(window).on("resize", resize);
 
 var margin = {top: 20, right: 40, bottom: 30, left: 40};
 var width = viewWidth - margin.left - margin.right - 50;
@@ -64,10 +64,13 @@ function drawScatterplot(data, excludedFeatures = []) {
 		featureNumber = res[2];
 
     /* Create a brush */
-    // var brush = d3.brush()
-    //     .on("brush start", brushStart)
-    //     .on("brush", brushMove)
-    //     .on("brush end", brushEnd);
+    var brush = d3.brush()
+		.extent(function() {
+			return [[scaleBottom.range()[0], scaleLeft.range()[1]], [scaleBottom.range()[1], scaleLeft.range()[0]]]
+		})
+        .on("start", brushStart)
+        .on("brush", brushMove)
+        .on("end", brushEnd);
 
     console.log(res);
 
@@ -112,7 +115,8 @@ function drawScatterplot(data, excludedFeatures = []) {
 				.enter()
 				.append("g")
 				.attr("class", "cell")
-				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + 15) + ", " + (featureNumber - d.j - 1) * scatterPlotSize + ")"; })
+				/* The constants 16 and 0.5 are used here for corrective purposes, i.e. to properly align the rectangle to the axes */
+				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + 16) + ", " + ((featureNumber - d.j - 1) * scatterPlotSize + 0.5) + ")"; })
 				.each(curryPlot);
 
 	/* Add a label to the cells found on the secondary diagonal of the scatter plot matrix */
@@ -121,38 +125,44 @@ function drawScatterplot(data, excludedFeatures = []) {
 		.attr("x", padding)
 		.attr("y", padding)
 		.attr("dy", ".71em")
-        .style("fill", "red")
 		.text(function(d) { return d.iName; });
 
-	//cells.call(brush);
+	cells.call(brush);
 
-	/*  */
     /* The brushCell variable will hold the cell currently selected by the brush */
     var brushCell;
 
     function brushStart(p) {
         if (brushCell !== this) {
-            d3.select(brushCell).call(brush.clear());
+            d3.select(brushCell).call(brush.move, null);
+            brushCell = this;
+            //brush.move(d3.select(brushCell), null);
+
             scaleBottom.domain(domains[p.iName]);
             scaleLeft.domain(domains[p.jName]);
-            brushCell = this;
         }
     }
 
     function brushMove(p) {
-        var e = brush.extent();
+        var e = d3.brushSelection(this);
 
-        console.log(e);
+        console.log("" + e);
+        console.log(p.iName + " " + p.jName);
 
-        svg.selectAll("circle").classed("hidden", function(d) {
-            return e[0][0] > d[p.x] || d[p.x] > e[1][0]
-                || e[0][1] > d[p.y] || d[p.y] > e[1][1];
-        });
+        if (!e)
+            svg.selectAll(".circle").classed("hidden", false);
+        else
+			svg.selectAll(".circle").classed("hidden", function (d) {
+				return e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0]
+					|| e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
+			});
+
     }
 
     // If the brush is empty, select all circles.
     function brushEnd() {
-        if (brush.empty()) svg.selectAll(".hidden").classed("hidden", false);
+        if (d3.event.selection === null)
+            svg.selectAll(".hidden").classed("hidden", false);
     }
 
 }

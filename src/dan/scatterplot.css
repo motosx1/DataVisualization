@@ -32,3 +32,14 @@ select {
 circle.hidden {
     fill: #ccc !important;
 }
+
+rect.frame {
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.cell text {
+    text-transform: uppercase;
+    font-weight: bold;
+    fill: red;
+}
