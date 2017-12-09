@@ -49,6 +49,38 @@ function getDomainAndFeatureNr(data, excludedFeatures) {
 	return [domain, featureNames, featureNumber];
 }
 
+function createBins(data, featureNames, binNumber) {
+
+	var bins = [];
+
+	for (var i = 0; i < featureNames.length; ++i) {
+
+		var currentExtent = d3.extent(data, function(d) { return d[featureNames[i]]; });
+		//currentExtent = [Math.ceil(currentExtent[0] / 100) * 100, Math.ceil(currentExtent[1] / 100) * 100];
+        console.log("Asd1: " + currentExtent);
+
+        // Generate the thresholds
+        currentExtent = d3.range(currentExtent[0], currentExtent[1],  Math.abs(currentExtent[1] - currentExtent[0]) / 10);
+
+        console.log("Asd2: " + currentExtent);
+		console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
+
+		bins.push(
+			d3
+				.histogram()
+				.thresholds(currentExtent)
+				(data.map(function(d) { return d[featureNames[i]]; } )) // , function(d) { return d[featureNames[i]]; }
+		);
+
+	}
+
+	console.log("The bins");
+	console.log(bins);
+
+
+	return bins;
+}
+
 function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 	/* remove what was previously in this SVG */
 	d3.select("#plotSVG").remove();
@@ -58,6 +90,8 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 	var domains = res[0];
 	var featureNames = getCommonSet(res[1], selectedFeatures);
     var featureNumber = res[2] < selectedFeatures.length ? res[2] : selectedFeatures.length;
+
+    var bins = createBins(data, featureNames, 10);
 
     /* Create a brush */
     var brush = d3.brush()
@@ -103,7 +137,7 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 
 	/* Define a Curry-like function */
 	var curryPlot = function(p) {
-        plotCellAndPoints(this, domains, data, p);
+        plotCellAndPoints(this, domains, data, p, bins);
 	};
 
 	/* Cartesian product the names of the relevant features */
@@ -127,7 +161,9 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 		.attr("dy", ".71em")
 		.text(function(d) { return d.iName; });
 
-	cells.call(brush);
+	cells
+		.filter(function (t) { return t.i !== t.j; })
+		.call(brush);
 
     /* The brushCell variable will hold the cell currently selected by the brush */
     var brushCell;
@@ -195,7 +231,7 @@ function cartesianProduct(featureSetA, featureSetB) {
 }
 
 
-function plotCellAndPoints(caller, domains, data, p) {
+function plotCellAndPoints(caller, domains, data, p, bins) {
     var cell = d3.select(caller);
 
     console.log(cell);
@@ -210,15 +246,59 @@ function plotCellAndPoints(caller, domains, data, p) {
     scaleBottom.domain(domains[p.iName]);
     scaleLeft.domain(domains[p.jName]);
 
-    cell.selectAll("circle")
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("class", "circle")
-        .attr("cx", function (d) { return scaleBottom(d[p.iName]); })
-        .attr("cy", function (d) { return scaleLeft(d[p.jName]); })
-        .attr("r", 3)
-        .style("fill", getRandomColor());
+    if (p.i !== p.j)
+		cell//.filter(function (d) { return d.i !== d.j; })
+			.selectAll("circle")
+			.data(data)
+			.enter()
+			.append("circle")
+			.attr("class", "circle")
+			.attr("cx", function (d) { return scaleBottom(d[p.iName]); })
+			.attr("cy", function (d) { return scaleLeft(d[p.jName]); })
+			.attr("r", 3)
+			.style("fill", getRandomColor());
+    else {
+    	cell.style("fill", "white");
+
+    	var max = d3.max(bins[p.i], function (d) {
+			return d.length;
+        });
+
+    	scaleLeft.domain([max, 0]);
+
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+
+        var bars = cell
+				.selectAll(".bar")
+				.data(bins[p.i])
+				.enter()
+				.append("g")
+				.attr("class", "bar")
+				.attr("transform", function(d) { return "translate(" + scaleBottom(d.x0) + ", " + (scaleLeft.range()[0] - scaleLeft(d.length) + 10) + ")"; } )
+            .on("mouseover", function(d) {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                div.html("Range:</br>[" + d3.format(".1f")(d.x0) + "," + d3.format(".1f")(d.x1) + "]</br>Count: " + d.length)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY + 10) + "px");
+            })
+            .on("mouseout", function(d) {
+                div.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
+
+        bars.append("rect")
+			.attr("x", 1)
+			.style("fill", "blue")
+            .attr("width", function (d) { return scaleBottom(d.x1) - scaleBottom(d.x0) - 1})
+            .attr("height", function(d) { console.log("The scale of " + d.length + " " + scaleLeft(d.length));  return scaleLeft(d.length) - 10; });
+    }
+
 }
 
 function resize() {
@@ -239,7 +319,7 @@ function getCommonSet(setA, setB) {
 
 	for (var indexA = 0, indexB = 0; indexA < setA.length && indexB < setA.length; ) {
 		if (setA[indexA] === setB[indexB]) {
-            finalSet.push(setA[indexA])
+            finalSet.push(setA[indexA]);
             ++indexA;
             ++indexB;
         } else if (setA[indexA] < setB[indexB])
