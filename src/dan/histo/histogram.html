@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<link rel=stylesheet href=histogram.css>
+		<script type="text/javascript" src="d3.v4.min.js" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="vis">
+			<svg></svg>
+		</div>
+
+		<div id="container">
+			<div id="selectionUI">
+				<form>#Bins: <input id="numBins" type="number" min="4" max="360" value = "25" onchange="setNumberOfBins()"></form>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="data.js"></script>
+		<script type="text/javascript" src="histogram.js"></script>
+	</body>
+</html>

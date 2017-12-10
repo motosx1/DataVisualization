@@ -1,7 +1,7 @@
 body {
-  font: 10px sans-serif;
-  margin: 0;
-  padding: 0;
+    font: 10px sans-serif;
+    margin: auto;
+    padding: 0px;
 }
 
 .axis path, .axis line {
@@ -86,4 +86,10 @@ text.label {
     stroke: black;
     fill: black;
     font-weight: 800;
+}
+
+div#vis,
+div#featuresDiv {
+    text-align: center;
+    margin: auto;
 }
