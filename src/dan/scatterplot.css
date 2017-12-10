@@ -67,3 +67,23 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
+
+.tick > text {
+    fill: gray;
+    font-weight: 800;
+}
+
+.tick > line {
+    stroke: #ddd;
+    stroke-dasharray: 2,2;
+}
+
+.domain {
+    stroke: transparent;
+}
+
+text.label {
+    stroke: black;
+    fill: black;
+    font-weight: 800;
+}

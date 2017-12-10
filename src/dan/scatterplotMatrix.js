@@ -9,7 +9,6 @@ var height = viewHeight - margin.top - margin.bottom - 50;
 // get the data
 var boats = boat_data.boats;
 
-
 /* Define a paading of 20px */
 var padding = 20;
 
@@ -22,7 +21,6 @@ var scaleLeft = d3.scaleLinear()
 
 var leftAxis = d3.axisLeft(scaleLeft)
     .ticks(6);
-
 
 /* Create a template for the bottom axis */
 var scaleBottom = d3.scaleLinear()
@@ -60,7 +58,7 @@ function createBins(data, featureNames, binNumber) {
         console.log("Asd1: " + currentExtent);
 
         // Generate the thresholds
-        currentExtent = d3.range(currentExtent[0], currentExtent[1],  Math.abs(currentExtent[1] - currentExtent[0]) / 10);
+        currentExtent = d3.range(currentExtent[0], currentExtent[1],  Math.abs(currentExtent[1] - currentExtent[0]) / binNumber);
 
         console.log("Asd2: " + currentExtent);
 		console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
@@ -106,8 +104,8 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 
     var distanceToBottom = scatterPlotSize * featureNumber;
 
-    // leftAxis.tickSize(-distanceToBottom);
-    // bottomAxis.tickSize(-distanceToBottom);
+    leftAxis.tickSize(-distanceToBottom);
+    bottomAxis.tickSize(-distanceToBottom);
 
     /* Start adding elements */
     var svg = d3
@@ -119,21 +117,33 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
         .attr("transform", "translate(" + padding + ", " + padding / 2 + ")");
 
 
-	svg.selectAll("xAxis")
-		.data(featureNames)
-		.enter()
-		.append("g")
-		.attr("class", "x_axis")
-		.attr("transform", function(d, i) { return "translate(" + ((i * scatterPlotSize) + 15) + ", " + (distanceToBottom - padding / 2) + ")" })
-		.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis); });
+	var xAxes = svg.selectAll("xAxis")
+				.data(featureNames)
+				.enter()
+					.append("g")
+					.attr("class", "x_axis")
+					.attr("transform", function(d, i) { return "translate(" + ((i * scatterPlotSize) + 15) + ", " + (distanceToBottom - padding / 2) + ")" })
+					.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis); })
+				.append("text")
+					.attr("class", "label")
+					.attr("x", padding / 2 + 10)
+					.attr("y", 20)
+					.style("text-anchor", "end")
+					.text(function(d) { return d.toUpperCase(); } );
 
 	svg.selectAll("yAxis")
         .data(featureNames)
         .enter()
         .append("g")
-        .attr("class", "y_axis")
-        .attr("transform", function(d, i) { return "translate(" + 25 + ", " + ((featureNumber - 1 - i) * scatterPlotSize) + ")" })
-        .each(function(d) { scaleLeft.domain(domains[d]); d3.select(this).call(leftAxis); });
+			.attr("class", "y_axis")
+			.attr("transform", function(d, i) { return "translate(" + 25 + ", " + ((featureNumber - 1 - i) * scatterPlotSize) + ")" })
+			.each(function(d) { scaleLeft.domain(domains[d]); d3.select(this).call(leftAxis); })
+        .append("text")
+			.attr("class", "label")
+			.attr("x", -15)
+			.attr("y", scatterPlotSize - padding / 2 - 10)
+			.style("text-anchor", "end")
+			.text(function(d) { return d.toUpperCase(); } );
 
 	/* Define a Curry-like function */
 	var curryPlot = function(p) {
