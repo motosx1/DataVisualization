@@ -113,7 +113,7 @@ function drawPoints(d, xScale, yScale, colorScale, colorNumberScale) {
                 .delay(transitionTime - 0.4 * transitionTime)
                 .text(Math.round(d.x) + "," + Math.round(d.y) + ", color= " + Math.round(d.u))
                 .attr("x", xScale(d.x) + colorNumberScale(d.u))
-                .attr("y", yScale(d.y))
+                .attr("y", yScale(d.y));
         })
 
         .on('mouseout', function (d) {
