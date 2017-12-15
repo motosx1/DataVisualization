@@ -3,10 +3,8 @@ function toNestedArray(data) {
 }
 
 function clusterKMeans(data, numclusters) {
-    nested_array = toNestedArray(data);
-
     var kmeans = new KMEANS();
-    var clusters = kmeans.run(nested_array, numclusters);
+    var clusters = kmeans.run(data, numclusters);
 
     out = [];
     for (var i = 0; i < clusters.length; i++) {
@@ -36,16 +34,19 @@ function reduceDimTSNE(data) {
     return tsne.getSolution(); // an array of 2-D points that you can plot
 }
 
-
-var data_boats = toNestedArray(boat_data['boats']);
-var clusters = clusterKMeans(boat_data['boats']);
-var reduced_tsne = reduceDimTSNE(data_boats);
-
-var data_tsne = [];
-var ob = {};
-for (i = 0; i < reduced_tsne.length; i++) {
-    ob = {x:reduced_tsne[i][0], y:reduced_tsne[i][1], category:clusters[i]};
-    data_tsne.push(ob);
+function toObjects(tsne_array, clusters) {
+    var objects = [];
+    var ob = {};
+    for (i = 0; i < reduced_tsne.length; i++) {
+        ob = {x:reduced_tsne[i][0], y:reduced_tsne[i][1], category:clusters[i]};
+        objects.push(ob);
+    }
+    return objects;
 }
 
-drawScatterplot(data_tsne);
+var data_boats = toNestedArray(boat_data['boats']);
+var reduced_tsne = reduceDimTSNE(data_boats);
+var clusters = clusterKMeans(data_boats);
+var tsne_clusters = toObjects(reduced_tsne, clusters);
+
+drawScatterplot(tsne_clusters);
