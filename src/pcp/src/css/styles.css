@@ -55,7 +55,7 @@ body{ background-repeat:no-repeat; background-position: top center; background-a
  *  2. Colors
  *
  *******************************************/
-body{ background-color: #1b1b1b; background-image: url(../images/bg.jpg); color: #444; }
+body{ background-color: white;
 #Stats{ background:#CC333F; color:white; border-top:1px solid #D65963; }
 	#Stats *{ color:white; }
 	#Stats .value{ text-shadow:0 2px 1px #AD2B35;}

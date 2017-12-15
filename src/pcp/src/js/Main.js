@@ -48,27 +48,41 @@ function Main(){
 Main.prototype = {
     init : function(csvFile){
         console.debug("Main: init");
-        d3.csv("./data/imports-85.csv", function(d) {
+        d3.csv("./data/car_data.csv", function(d) {
         return {
             'make': d['make'],
-            'fuel-type' : d['fuel-type'],
+            'fuel-type' : d['fuel_type'],
             'length' : +d['length'],
             'width' :+d['width'],
-            'weight': +d['curb-weight'],
-            'cylinders' : +d['num-of-cylinders'],
-            'engine-size' : +d['engine-size'],
-            'fuel-system': d['fuel-system'],
-            'compression' : +d['compression-ratio'],
+            'weight': +d['curb_weight'],
+            'cylinders' : +d['num_of_cylinders'],
+            'engine-size' : +d['engine_size'],
+            'fuel-system': d['fuel_system'],
+            'compression' : +d['compression_ratio'],
             'horsepower' : +d['horsepower'],
-            'city-mpg' : +d['city-mpg'],
+            'city-mpg' : +d['city_mpg'],
             'price' : +d['price'],
         };
         }, function(data) {
+
             self._data = data;
             self._data_selected = self._data.slice();
+            self.cluster();
             self.setupCharts();
+
         });    
         
+    },
+
+    cluster : function(){
+        // var initial_array = toNestedArray(self._data);
+        // var reduced_tsne = reduceDimTSNE(initial_array);
+        // console.log(reduced_tsne[0]);
+        // var clusters = clusterKMeans(initial_array);
+        // var tsne_clusters = toObjects(reduced_tsne, clusters);
+        // //
+        // drawScatterplot(tsne_clusters)
+
     },
 
     setupCharts : function(){
