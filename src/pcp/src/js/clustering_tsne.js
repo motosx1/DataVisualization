@@ -42,7 +42,7 @@ function reduceDimTSNE(data) {
     // initialize data.
     tsne.initDataRaw(data);
 
-    for (var k = 0; k < 500; k++) {
+    for (var k = 0; k < 50; k++) {
         tsne.step(); // every time you call this, solution gets better
     }
 

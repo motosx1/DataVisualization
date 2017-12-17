@@ -29,7 +29,7 @@
     <!--<link href="lib/slick/slick.grid.css" rel="stylesheet" />-->
     <!--<link href="lib/slick/slick-default.theme.css" rel="stylesheet" />-->
 
-    <!-- Slick dependencies -->s
+    <!-- Slick dependencies -->
     <script src="lib/slick/lib/jquery-1.7.min.js"></script>
     <script src="lib/slick/lib/jquery-ui-1.8.16.custom.min.js"></script>
     <script src="lib/slick/lib/jquery.event.drag-2.2.js"></script>
@@ -40,7 +40,7 @@
     <script src="lib/slick/slick.grid.js"></script>
 
     <!-- JS scripts -->
-    <script src="src/js/ParallelCoordinatesPlot.js"></script>
+    <!--<script src="src/js/ParallelCoordinatesPlot.js"></script>-->
     <script src="src/js/ParallelCoordinatesPlot2.js"></script>
     <script src="src/js/DonutChartGrouped.js"></script>
     <script src="src/js/DonutChartTotals.js"></script>
@@ -56,69 +56,33 @@
 </head>
 <body>
 
-<!--  LOGOTYPE LINE  -->
-<!--<div id="Head" class="container">-->
-<!--<div class="row">-->
-<!--<div class="col span_16">-->
-<!--<h1 id="Domain">Cars Visualization<br>-->
-<!--<span>Visualize and explore the data with awesome charts!</span></h1>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!-- END OF LOGOTYPE LINE  -->
-
-<!--<div id="Stats" class="container">-->
-<!--<div class="row">-->
-<!--<div class="col span_12"><b class="value" id="n_cars"></b><i class="info">Cars</div>-->
-<!--<div class="col span_12"><b class="value" id="n_vars"></b><i class="info">Variables</i></div>-->
-<!--</div>-->
-<!--</div>-->
-<!-- END OF STATS LINE  -->
-
-<!-- CONTENT -->
-<!--<div id="Content" class="container">-->
-<!---->
-<!--<div class="row special">-->
-<!--<div class="col span_24">-->
-<!--<div id="legend"></div>-->
-<!--</div>-->
-<!--</div>-->
-
-<!--<div class="row padding">-->
-<!--<div class="col span_12">-->
-<!--<h3 class="align-center">Selected Data</h3>-->
-<!--<div class="pie"  id="pie-totals"></div>-->
-<!--</div>-->
-<!--<div class="col span_12">-->
-<!--<h3 class="align-center">Makes Breakdown</h3>	-->
-<!--<div class="pie"  id="pie-groups"></div>-->
-<!--</div>-->
-<!--</div> &lt;!&ndash; end of row &ndash;&gt;-->
-<!--<hr class="divider">-->
-<!--<div class="row padding" >-->
-<!--<div class="col span_24">-->
-<!--<h3 class="align-center">Parallel Coordinates Plot</h3>-->
-<!--<div id="pcp"> </div>-->
-<!--</div>-->
-<!--</div> &lt;!&ndash; end of row &ndash;&gt;-->
-<!---->
-<!--<div class="row padding">-->
-<!--<div class="col span_24">-->
-<!--<h3 class="align-center">Detailed infomation</h3>-->
-<!--<div id="data-table"> </div>-->
-<!--</div>-->
-<!--</div> &lt;!&ndash; end of row &ndash;&gt;-->
-
-<!--</div>-->
 
 
 <div id="pcp_chart">
 
 </div>
 
-<div id="table">
+<!--<div id="table" class="scroll-window">-->
 
+<!--</div>-->
+
+
+
+
+<div id="bodywrap">
+    <div class="row">
+        <div class="large-10 columns">
+            <div class="scroll-window-wrapper">
+
+                <div id="table" class="scroll-window">
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 <div>
     <svg id="vis"></svg>
