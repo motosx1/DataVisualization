@@ -5,13 +5,13 @@ window.parallelCoordinatesChart = function(id, data, colors, dimensions, brush_c
     var margin = {top: 30, right: 10, bottom: 10, left: 60},
         width = 950 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
-    var x = d3.scale.ordinal().rangePoints([0, width], 1),
+    var x = d3.scaleOrdinal().range([0, width], 1),
         y = {},
         dragging = {},
         highlighted = null;
 
-    var line = d3.svg.line().interpolate('cardinal').tension(0.95),
-        axis = d3.svg.axis().orient("left"),
+    var line = d3.curveCardinal.tension(0.95),
+        axis = d3.axisLeft(),
         background,
         foreground;
 
@@ -31,11 +31,11 @@ window.parallelCoordinatesChart = function(id, data, colors, dimensions, brush_c
               domain.push(row[attr]);
             }
           })
-          y[attr] = d3.scale.ordinal()
+          y[attr] = d3.scaleOrdinal()
                           .domain(domain)
-                          .rangePoints([height, 0], 1);
+                          .range([height, 0], 1);
         }else {
-          y[attr] = d3.scale.linear()
+          y[attr] = d3.scaleLinear()
                           .domain(d3.extent(data, function(row) { return +row[attr]; }))
                           .range([height, 0]);
         }
@@ -69,8 +69,8 @@ window.parallelCoordinatesChart = function(id, data, colors, dimensions, brush_c
         .attr("class", "dimension")
         .attr("width", 250)
         .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
-        .call(d3.behavior.drag()
-            .on("dragstart", function(d) {
+        .call(d3.drag()
+            .on("start", function(d) {
               dragging[d] = this.__origin__ = x(d);
               background.attr("visibility", "hidden");
             })
@@ -81,7 +81,7 @@ window.parallelCoordinatesChart = function(id, data, colors, dimensions, brush_c
               x.domain(dimensions);
               g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
             })
-            .on("dragend", function(d) {
+            .on("end", function(d) {
               delete this.__origin__;
               delete dragging[d];
               d3.select(this).attr("transform", "translate(" + x(d) + ")").transition().duration(500);
@@ -107,7 +107,7 @@ window.parallelCoordinatesChart = function(id, data, colors, dimensions, brush_c
     // Add and store a brush for each axis.
     g.append("svg:g")
         .attr("class", "brush")
-        .each(function(d) { d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brush", brush)); })
+        .each(function(d) { d3.select(this).call(y[d].brush = d3.brushY().on("brush", brush)); })
     .selectAll("rect")
         .attr("x", -12)
         .attr("width", 24);

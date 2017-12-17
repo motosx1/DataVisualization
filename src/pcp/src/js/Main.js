@@ -50,7 +50,7 @@ Main.prototype = {
         console.debug("Main: init");
         d3.csv("./data/car_data.csv", function(d) {
         return {
-            'make': d['make'],
+            'make' : d['make'],
             'fuel-type' : d['fuel_type'],
             'length' : +d['length'],
             'width' :+d['width'],
@@ -61,6 +61,7 @@ Main.prototype = {
             'compression' : +d['compression_ratio'],
             'horsepower' : +d['horsepower'],
             'city-mpg' : +d['city_mpg'],
+            'highway-mpg' : +d['highway_mpg'],
             'price' : +d['price'],
         };
         }, function(data) {
@@ -87,12 +88,12 @@ Main.prototype = {
 
     setupCharts : function(){
         var dimensions = ['make', 'fuel-type', 'compression', 'city-mpg' , 'cylinders', 'weight', 'engine-size','length', 'horsepower','width', 'price'];
-        self._stats = stats(self._data);
-        self._pcp = parallelCoordinatesChart("pcp", self._data, self._colors, dimensions, self.callback_applyBrushFilter);
-        self._legend = legendChart("legend", self._data_selected, self._colors, self.callback_applyGroupFilter)
-        self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
-        self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
-        self._dataTable = dataTable("data-table", self._data_selected, dimensions, self._colors, self._pcp.highlight_single)
+        // self._stats = stats(self._data);
+        self._pcp = parallelCoordinatesChart2("pcp", self._data, self._colors, dimensions, self.callback_applyBrushFilter);
+        // self._legend = legendChart("legend", self._data_selected, self._colors, self.callback_applyGroupFilter)
+        // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
+        // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
+        // self._dataTable = dataTable("data-table", self._data_selected, dimensions, self._colors, self._pcp.highlight_single)
     },
     
     callback_applyBrushFilter : function(brushed_data){
