@@ -1,4 +1,4 @@
-window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brush_callback) {
+window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, types) {
     // var original_data = data;
     // var parallelCoordinatesChart = {};
 
@@ -6,7 +6,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
     //     width = 950 - margin.left - margin.right,
     //     height = 500 - margin.top - margin.bottom;
 
-    var margin = {top: 66, right: 110, bottom: 20, left: 188},
+    var margin = {top: 96, right: 110, bottom: 20, left: 188},
         width = document.body.clientWidth - margin.left - margin.right,
         height = 540 - margin.top - margin.bottom,
         innerHeight = height - 2;
@@ -15,6 +15,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
 
     var color = d3.scaleOrdinal()
         .range(["#5DA5B3", "#D58323", "#DD6CA7", "#54AF52", "#8C92E8", "#E15E5A", "#725D82", "#776327", "#50AB84", "#954D56", "#AB9C27", "#517C3F", "#9D5130", "#357468", "#5E9ACF", "#C47DCB", "#7D9E33", "#DB7F85", "#BA89AD", "#4C6C86", "#B59248", "#D8597D", "#944F7E", "#D67D4B", "#8F86C2"]);
+
 
     var types = {
         "Number": {
@@ -64,6 +65,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
         },
         {
             key: "fuel-type",
+            description: "Fuel Type",
             type: types["String"],
             axis: d3.axisLeft()
                 .tickFormat(function (d, i) {
@@ -72,31 +74,37 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
         },
         {
             key: "length",
+            description: "Length",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "width",
+            description: "Width",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "weight",
+            description: "Weight",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "cylinders",
+            description: "Cylinders",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "engine-size",
+            description: "Engine size",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "fuel-system",
+            description: "Fuel system",
             type: types["String"],
             axis: d3.axisLeft()
                 .tickFormat(function (d, i) {
@@ -105,30 +113,36 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
         },
         {
             key: "compression",
+            description: "Compression",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "horsepower",
+            description: "Horsepower",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "city-mpg",
+            description: "City mpg consumption",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "highway-mpg",
+            description: "Highway mpg consumption",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "price",
+            description: "Price",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         }
     ];
+
 
     var xscale = d3.scalePoint()
         .domain(d3.range(dimensions.length))
@@ -204,7 +218,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
         dim.scale.domain(dim.domain);
     });
 
-    var render = renderQueue(draw).rate(50);
+    var render = renderQueue(draw).rate(20);
 
     ctx.clearRect(0, 0, width, height);
     ctx.globalAlpha = d3.min([0.85 / Math.pow(data.length, 0.3), 1]);
@@ -218,7 +232,9 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, brus
             d3.select(this).call(renderAxis);
         })
         .append("text")
-        .attr("class", "title")
+        .attr("class", function (d, i) {
+            return i % 2 === 0 ? "title odd" : "title even";
+        })
         .attr("text-anchor", "start")
         .text(function (d) {
             return "description" in d ? d.description : d.key;

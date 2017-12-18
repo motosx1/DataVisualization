@@ -16,9 +16,10 @@
 
 .axis .title {
     font-size: 10px;
-    transform: translate(-15px, -20px);
     fill: #222;
+    transform: rotate(-15deg) translate(-5px, -20px);
 }
+
 
 .axis line,
 .axis path {
@@ -73,8 +74,9 @@ table.fixed-header th div {
     color: #333;
 }
 
-table.fixed-header thead tr {
+table.fixed-header thead th {
     height: 2.5rem;
+    width: 30px;
 }
 
 .user-list {

@@ -89,21 +89,22 @@ Main.prototype = {
     },
 
     setupCharts: function () {
-        var dimensions = ['make',
-            'fuel-type',
-            'length',
-            'width',
-            'weight',
-            'cylinders',
-            'engine-size',
-            'fuel-system',
-            'compression',
-            'horsepower',
-            'city-mpg',
-            'highway-mpg',
-            'price'];
+        // var dimensions = ['make',
+        //     'fuel-type',
+        //     'length',
+        //     'width',
+        //     'weight',
+        //     'cylinders',
+        //     'engine-size',
+        //     'fuel-system',
+        //     'compression',
+        //     'horsepower',
+        //     'city-mpg',
+        //     'highway-mpg',
+        //     'price'];
+
         // self._stats = stats(self._data);
-        self._pcp = parallelCoordinatesChart2("pcp", self._data, self._colors, dimensions, self.callback_applyBrushFilter);
+        self._pcp = parallelCoordinatesChart2("pcp", self._data, self._colors, null, null);
         // self._legend = legendChart("legend", self._data_selected, self._colors, self.callback_applyGroupFilter)
         // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
         // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
