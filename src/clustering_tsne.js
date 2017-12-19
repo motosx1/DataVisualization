@@ -46,6 +46,7 @@ function reduceDimTSNE(data) {
 }
 
 /* Zips the TSNE reduced data with the clusters and turns the result into a list of objects.
+   zipWith (\xy, c -> {x:xy[0], y:xy[1], category:c})
 
    @param tsne_array: [[Double]], containing output from TSNE
    @param clusters: [Int], containing a list of cluster assignments
