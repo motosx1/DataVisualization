@@ -104,3 +104,29 @@ li {
     display: inline;
     padding: 20px;
 }
+
+.button {
+    background-color: #007bff; /* Green */
+    border: 2px solid white;
+    opacity: 1;
+    color: white;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 11px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.1s; /* Safari */
+    transition-duration: 0.1s;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    border: 2px solid #007bff;
+}
+
+.selected {
+    background-color: #007bff66;
+}

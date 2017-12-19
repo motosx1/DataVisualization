@@ -7,7 +7,7 @@ var width = viewWidth - margin.left - margin.right - 50;
 var height = viewHeight - margin.top - margin.bottom - 50;
 
 // get the data
-var boats = boat_data.boats
+var boats;
 
 /* Define a paading of 20px */
 var padding = 20;
@@ -27,7 +27,9 @@ var scaleBottom = d3.scaleLinear()
     .range([padding / 2, scatterPlotSize - padding / 2]);
 
 var bottomAxis = d3.axisBottom(scaleBottom)
-    .ticks(6);
+    .ticks(3);
+
+var totalFeatures;
 
 var mainData;
 
@@ -49,6 +51,27 @@ function getDomainAndFeatureNr(data, excludedFeatures) {
 	return [domain, featureNames, featureNumber];
 }
 
+function rescaleCoords(total) {
+    var chart = d3.select('#headingFour');
+    var targetWidth = chart.node().getBoundingClientRect().width;
+
+    scatterPlotSize = targetWidth / total - padding;
+
+    /* Create a template for the left axis */
+    scaleLeft = d3.scaleLinear()
+        .range([scatterPlotSize - padding / 2, padding / 2]);
+
+    leftAxis = d3.axisLeft(scaleLeft)
+        .ticks(6);
+
+    /* Create a template for the bottom axis */
+    scaleBottom = d3.scaleLinear()
+        .range([padding / 2, scatterPlotSize - padding / 2]);
+
+    bottomAxis = d3.axisBottom(scaleBottom)
+        .ticks(3);
+}
+
 function createBins(data, featureNames, binNumber) {
 
 	var bins = [];
@@ -57,13 +80,13 @@ function createBins(data, featureNames, binNumber) {
 
 		var currentExtent = d3.extent(data, function(d) { return d[featureNames[i]]; });
 		//currentExtent = [Math.ceil(currentExtent[0] / 100) * 100, Math.ceil(currentExtent[1] / 100) * 100];
-        console.log("Asd1: " + currentExtent);
+        //console.log("Asd1: " + currentExtent);
 
         // Generate the thresholds
         currentExtent = d3.range(currentExtent[0], currentExtent[1],  Math.abs(currentExtent[1] - currentExtent[0]) / binNumber);
 
-        console.log("Asd2: " + currentExtent);
-		console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
+        //console.log("Asd2: " + currentExtent);
+		//console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
 
 		bins.push(
 			d3
@@ -74,18 +97,25 @@ function createBins(data, featureNames, binNumber) {
 
 	}
 
-	console.log("The bins");
-	console.log(bins);
+	//console.log("The bins");
+	//console.log(bins);
 
 
 	return bins;
 }
 
-function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
+window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFeatures = []) {
 	/* remove what was previously in this SVG */
 	d3.select("#plotSVG").remove();
 
-	mainData = data;
+    mainData = data;
+
+    rescaleCoords(selectedFeatures.length);
+    //addButtons(selectedFeatures);
+    totalFeatures = selectedFeatures;
+
+	//console.log("HERE");
+	//console.log(data);
 
 	/* Get some info on the data */
 	var res = getDomainAndFeatureNr(data, excludedFeatures);
@@ -104,7 +134,7 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
         .on("brush", brushMove)
         .on("end", brushEnd);
 
-    console.log(res);
+    //console.log(res);
 
     var distanceToBottom = scatterPlotSize * featureNumber;
 
@@ -113,7 +143,7 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 
     /* Start adding elements */
     var svg = d3
-		.select("#vis")
+		.select("#vis-scatter-matrix")
         .append("svg")
 		.attr("id", "plotSVG")
         .attr("width", distanceToBottom + padding)
@@ -196,8 +226,8 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
     function brushMove(p) {
         var e = d3.brushSelection(this);
 
-        console.log("" + e);
-        console.log(p.iName + " " + p.jName);
+        //console.log("" + e);
+        //console.log(p.iName + " " + p.jName);
 
         if (!e)
             svg.selectAll(".circle").classed("hidden", false);
@@ -248,7 +278,7 @@ function cartesianProduct(featureSetA, featureSetB) {
 function plotCellAndPoints(caller, domains, data, p, bins) {
     var cell = d3.select(caller);
 
-    console.log(cell);
+    //console.log(cell);
 
     cell.append("rect")
         .attr("class", "frame")
@@ -270,7 +300,7 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 			.attr("cx", function (d) { return scaleBottom(d[p.iName]); })
 			.attr("cy", function (d) { return scaleLeft(d[p.jName]); })
 			.attr("r", 3)
-			.style("fill", getRandomColor());
+			.style("fill", function(d) { return d['category']; });
     else {
     	cell.style("fill", "white");
 
@@ -310,7 +340,7 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 			.attr("x", 1)
 			.style("fill", "blue")
             .attr("width", function (d) { return scaleBottom(d.x1) - scaleBottom(d.x0) - 1})
-            .attr("height", function(d) { console.log("The scale of " + d.length + " " + scaleLeft(d.length));  return scaleLeft(d.length) - 10; });
+            .attr("height", function(d) { /*console.log("The scale of " + d.length + " " + scaleLeft(d.length));*/  return scaleLeft(d.length) - 10; });
     }
 
 }
@@ -322,7 +352,7 @@ function resize() {
   width = viewWidth - margin.left - margin.right - 50;
   height = viewHeight - margin.top - margin.bottom - 50;
 
-  drawScatterplot(boats);
+  drawScatterplotMatrix(boats);
 }
 
 function getCommonSet(setA, setB) {
@@ -345,38 +375,98 @@ function getCommonSet(setA, setB) {
 	return finalSet;
 }
 
-var totalFeatures = d3.keys(boats[0]); // ["a", "m", "u", "v", "x", "y"];
+// $(function() {
+//
+//     d3.csv("./car_data.csv", function (d) {
+//         return {
+//             'make': d['make'],
+//             'fuel-type': d['fuel_type'],
+//             'length': +d['length'],
+//             'width': +d['width'],
+//             'weight': +d['curb_weight'],
+//             'cylinders': +d['num_of_cylinders'],
+//             'engine-size': +d['engine_size'],
+//             'fuel-system': d['fuel_system'],
+//             'compression': +d['compression_ratio'],
+//             'horsepower': +d['horsepower'],
+//             'city-mpg': +d['city_mpg'],
+//             'highway-mpg': +d['highway_mpg'],
+//             'price': +d['price']
+//         };
+//     }, function (data) {
+//
+//         boats = data;
+//
+//     });
+//
+//     console.log("Data: " + boats);
+//
+//     var totalFeatures = d3.keys(boats[0]);
+//
+//
+//
+//     console.log("The total features are: " + boats);
+//     //
+//     // for (var i = 0; i < totalFeatures.length; ++i) {
+// 		// var newElement = "<li onclick='elementSelected(this)' value='" + totalFeatures[i] + "' class = 'featureFont'>" + totalFeatures[i] + "</li>";
+//     //
+// 		// $("#features").append(newElement);
+//     // }
+//     //
+//     //
+//     // drawScatterplotMatrix(boats, totalFeatures);
+// });
 
-$(function() {
-
-	for (var i = 0; i < totalFeatures.length; ++i) {
-		var newElement = "<li onclick='elementSelected(this)' value='" + totalFeatures[i] + "' class = 'featureFont'>" + totalFeatures[i] + "</li>";
-
-		$("#features").append(newElement);
-	}
-
-    console.log(totalFeatures);
-
-    drawScatterplot(boats, totalFeatures);
-});
-
-function elementSelected(element) {
+window.elementSelected = function(element) {
 	var value = element.getAttribute("value");
     var index = totalFeatures.indexOf(value);
 
-	console.log(value);
+	//console.log(value);
 
 	if (index >= 0) {
         totalFeatures.splice(index, 1);
     	// element.setAttribute("style", "color: black;");
-		$(element).addClass("unselectedFont");
+		$(element).addClass("selected");
 	} else {
         totalFeatures.push(value);
     	// element.removeAttribute("style");
-        $(element).removeClass("unselectedFont");
+        $(element).removeClass("selected");
 	}
 
-	console.log(totalFeatures);
+	//console.log(totalFeatures);
 
-    drawScatterplot(data, totalFeatures);
+    drawScatterplotMatrix(mainData, totalFeatures);
+}
+
+
+window.getFeatureNames = function(data) {
+	var myKeys = d3.keys(data[0]);
+	var finalKeys = [];
+
+	for (var i = 0; i < myKeys.length; ++i) {
+
+		var type = typeof data[0][myKeys[i]];
+
+		console.log("Type:" + type);
+
+		if (type !== "string")
+            finalKeys.push(myKeys[i]);
+
+	}
+
+	console.log("Names: " + finalKeys);
+
+	return finalKeys;
+}
+
+window.addButtons = function(featureNames) {
+
+	$("#featuresDiv").empty()
+
+    for (var i = 0; i < featureNames.length; ++i) {
+		var newElement = "<button onclick='elementSelected(this)' value='" + featureNames[i] + "' class = 'button'>" + featureNames[i] + "</button>";
+
+		$("#featuresDiv").append(newElement);
+    }
+
 }

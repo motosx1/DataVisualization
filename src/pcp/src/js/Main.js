@@ -13,6 +13,7 @@ function Main() {
     self._legend = null;
     self._dataTable = null;
     self._stats = null;
+    self._scatterPlot = null;
 
     // Other
     self._colors = {
@@ -96,6 +97,8 @@ Main.prototype = {
 
     setupCharts: function () {
         self._pcp = parallelCoordinatesChart2("pcp", self._data, self._colors, null, null);
+        self._scatterPlot = drawScatterplotMatrix(self._data, getFeatureNames(self._data));
+        addButtons(getFeatureNames(self._data));
         // self._legend = legendChart("legend", self._data_selected, self._colors, self.callback_applyGroupFilter)
         // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
         // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);

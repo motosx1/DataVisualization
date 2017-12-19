@@ -12,6 +12,7 @@
 
     <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>-->
     <link rel="stylesheet" href="src/css/charts.css"/>
+    <link rel="stylesheet" href="src/css/scatterplot.css"/>
     <link rel="icon" type="image/png" href="src/images/favicon.ico">
 
     <!-- Lib dependencies -->
@@ -51,6 +52,7 @@
     <script src="src/js/Stats.js"></script>
     <script src="src/js/scatterplot_tsne.js"></script>
     <script src="src/js/clustering_tsne.js"></script>
+    <script src="src/js/scatterplotMatrix.js"></script>
     <script src="src/js/Main.js"></script>
 
 </head>
@@ -104,7 +106,7 @@
                         <h5 class="mb-0">
                             <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false"
                                aria-controls="collapseThree">
-                                Scatterplot matrix
+                                t-SNE plot
                             </a>
                         </h5>
                     </div>
@@ -113,6 +115,31 @@
                             <div id="tsne-div">
 		                            <svg id="tsne"></svg>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header" role="tab" id="headingFour">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseFour" aria-expanded="false"
+                               aria-controls="collapseFour">
+                                Scatterplot matrix
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingFour">
+                        <div class="card-block">
+
+
+
+                            <div id = "featuresDiv">
+                            </div>
+                            <div id="vis-scatter-matrix">
+                            </div>
+
+
+
+
                         </div>
                     </div>
                 </div>
