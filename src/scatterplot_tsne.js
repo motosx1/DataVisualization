@@ -19,7 +19,7 @@ function drawScatterplot(data) {
     var yAxis = d3.axisLeft()
         .scale(yScale);
 
-    var svg = d3.select("svg")
+    var svg = d3.select("#clustering")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
