@@ -57,7 +57,7 @@ function drawScatterplot(data) {
         .attr("r", 3.5)
         .attr("cx", function(d) { return xScale(d.x); })
         .attr("cy", function(d) { return yScale(d.y); })
-        .style("fill", function(d) { return color(d.category); })
+        .style("fill", function(d) { return color_function(d.category); })
         .on('mouseover', function (d) {
             var transitionTime = 100;
 
@@ -91,7 +91,7 @@ function drawScatterplot(data) {
         });
 
     var legend = svg.selectAll(".legend")
-        .data(color.domain())
+        .data(color_domain)
         .enter().append("g")
         .attr("class", "legend")
         .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -100,12 +100,12 @@ function drawScatterplot(data) {
         .attr("x", width - 18)
         .attr("width", 18)
         .attr("height", 18)
-        .style("fill", color);
+        .style("fill", function(d,i) { return color_function(i); });
 
     legend.append("text")
         .attr("x", width - 24)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function(d) { return d; });
+        .text(function(d, i) { return "Category "+(i+1); });
 }

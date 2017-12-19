@@ -123,13 +123,13 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
         },
         {
             key: "city-mpg",
-            description: "City mpg consumption",
+            description: "City mpg",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
         {
             key: "highway-mpg",
-            description: "Highway mpg consumption",
+            description: "Highway mpg",
             type: types["Number"],
             scale: d3.scaleLinear().range([innerHeight, 0])
         },
@@ -216,7 +216,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
         dim.scale.domain(dim.domain);
     });
 
-    var render = renderQueue(draw).rate(20);
+    var render = renderQueue(draw);
 
     ctx.clearRect(0, 0, width, height);
     ctx.globalAlpha = d3.min([0.85 / Math.pow(data.length, 0.3), 1]);
@@ -256,15 +256,14 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
     d3.selectAll(".axis.food_group .tick text")
         .style("fill", color);
 
-    var output = d3.select("#table").append("table").attr("class", "table table-striped table-hover user-list fixed-header");
+    var output = d3.select("#tableDiv").append("table").attr("class", "table table-striped");
 
     function drawTable(dataToDisplay) {
         output.text("");
         var thead = output.append("thead");
         var tr = thead.append("tr");
-        dimensions.forEach(function (dim) {
-            var th = tr.append("th");
-            th.append("div").text(dim.key);
+        dimensions.forEach(function (dim, i) {
+            tr.append("th").text(dim.description);
         });
         var tbody = output.append("tbody");
         dataToDisplay.forEach(function (d) {
@@ -291,7 +290,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
     }
 
     function getColor(i) {
-        var color = d3.schemeCategory20;
+        // var color = d3.schemeCategory20;
         return color[i];
         // return color[Math.floor(Math.random() * (20 + 1))];
     }
@@ -300,7 +299,8 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
         ctx.beginPath();
         var coords = project(d);
         coords.forEach(function (p, i) {
-            ctx.strokeStyle = getColor(p[2]);
+            ctx.strokeStyle = p[2];
+            ctx.strokeStyle
             // this tricky bit avoids rendering null values as 0
             if (p === null) {
                 // this bit renders horizontal lines on the previous/next
