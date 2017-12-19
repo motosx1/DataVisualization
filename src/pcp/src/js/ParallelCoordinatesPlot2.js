@@ -2,12 +2,10 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
     // var original_data = data;
     // var parallelCoordinatesChart = {};
 
-    // var margin = {top: 30, right: 10, bottom: 10, left: 60},
-    //     width = 950 - margin.left - margin.right,
-    //     height = 500 - margin.top - margin.bottom;
-
-    var margin = {top: 96, right: 110, bottom: 20, left: 188},
-        width = document.body.clientWidth - margin.left - margin.right,
+    var chart = d3.select('#headingOne');
+    var targetWidth = chart.node().getBoundingClientRect().width;
+    var margin = {top: 96, right: 60, bottom: 20, left: 100},
+        width = targetWidth - margin.left - margin.right,
         height = 540 - margin.top - margin.bottom,
         innerHeight = height - 2;
 

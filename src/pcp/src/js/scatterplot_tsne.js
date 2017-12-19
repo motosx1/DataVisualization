@@ -1,5 +1,5 @@
 function drawScatterplot(data) {
-    var chart = d3.select('#tsne-div'),
+    var chart = d3.select("#headingThree"),
         targetWidth = chart.node().getBoundingClientRect().width;
 
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
