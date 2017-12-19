@@ -1,5 +1,4 @@
 function toNestedArray(data) {
-    // console.log(data[0]);
     var ret = data.map(x => [
         x['length'],
         x['width'],
@@ -12,12 +11,16 @@ function toNestedArray(data) {
         x['price']
     ]);
 
-    // console.log(ret[0]);
     return ret;
 }
 
+/* Clusters the data in the given amount of clusters.
+
+   @param data: [[Double]], containing the data
+   @param numblusters: Int, the number of clusters
+   @return [Int], containing the cluster assignments
+   */
 function clusterKMeans(data, numclusters) {
-    // console.log(data[0]);
     var kmeans = new KMEANS();
     var clusters = kmeans.run(data, numclusters);
 
@@ -31,10 +34,15 @@ function clusterKMeans(data, numclusters) {
     return out;
 }
 
+/* Applies TSNE dimensionality reduction algorithm.
+
+   @param data: [[Double]], containing the data
+   @return [[Double]], containing the data with reduced dimensionality
+   */
 function reduceDimTSNE(data) {
     var opt = {};
     opt.epsilon = 10; // epsilon is learning rate (10 = default)
-    opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
+    opt.perplexity = 20; // roughly how many neighbors each point influences (30 = default)
     opt.dim = 2; // dimensionality of the embedding (2 = default)
 
     var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
@@ -42,26 +50,36 @@ function reduceDimTSNE(data) {
     // initialize data.
     tsne.initDataRaw(data);
 
-    for (var k = 0; k < 50; k++) {
+    for(var k = 0; k < 500; k++) {
         tsne.step(); // every time you call this, solution gets better
     }
 
     return tsne.getSolution(); // an array of 2-D points that you can plot
 }
 
-function toObjects(reduced_tsne, clusters) {
+/* Zips the TSNE reduced data with the clusters and turns the result into a list of objects.
+   zipWith (\xy, c -> {x:xy[0], y:xy[1], category:c})
+
+   @param tsne_array: [[Double]], containing output from TSNE
+   @param clusters: [Int], containing a list of cluster assignments
+   @return [{x:,y:,category:}], list of objects containing the coordinates and category of a point
+   */
+function toObjects(tsne_array, clusters, data) {
     var objects = [];
     var ob = {};
-    for (i = 0; i < reduced_tsne.length; i++) {
-        ob = {x: reduced_tsne[i][0], y: reduced_tsne[i][1], category: clusters[i]};
-        objects.push(ob);
+    for (i = 0; i < tsne_array.length; i++) {
+        ob = {x:tsne_array[i][0], y:tsne_array[i][1], category:clusters[i]};
+        ob2 = Object.assign(ob, data[i]);
+        objects.push(ob2);
     }
     return objects;
 }
 
-// var data_boats = toNestedArray(boat_data['boats']);
-// var reduced_tsne = reduceDimTSNE(data_boats);
-// var clusters = clusterKMeans(data_boats);
-// var tsne_clusters = toObjects(reduced_tsne, clusters);
-//
-// drawScatterplot(tsne_clusters);
+/// Example workflow
+// Work out thew datapoints
+//var data_boats = toNestedArray(data);
+//var reduced_tsne = reduceDimTSNE(data_boats);
+//var clusters = clusterKMeans(data_boats);
+//var tsne_clusters = toObjects(reduced_tsne, clusters);
+
+//drawScatterplot(tsne_clusters);
