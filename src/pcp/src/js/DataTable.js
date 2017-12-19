@@ -1,4 +1,4 @@
-window.dataTable = function(id, data, columns, colors, callback_highlight){
+window.dataTable = function(id, data, columns, colors){
 	var dataTable = {};
 	var _data = data;
 	var columns2 = [
@@ -6,10 +6,12 @@ window.dataTable = function(id, data, columns, colors, callback_highlight){
 		{ name: "Fuel-type", field: "fuel-type", id: "fuel-type", sortable: true, width: 65, resizable: false , headerCssClass: "prKeyHeadColumn", formatter:FuelFormatter },
 	    { name: "Compression", field: "compression", id: "compression", sortable: true, width: 95, resizable: false, headerCssClass: "prKeyHeadColumn", cssClass: "numericCell" },
 	    { name: "City-Mpg (mi)", field: "city-mpg", id: "city-mpg", sortable: true, width: 90, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell"},
+	    { name: "Highway-Mpg (mi)", field: "highway-mpg", id: "highway-mpg", sortable: true, width: 90, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell"},
 	    { name: "Cylinders", field: "cylinders", id: "cylinders", sortable: true, width: 65, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell"},
 	    { name: "Weight (lbs)", field: "weight", id: "weight", sortable: true, width: 85, resizable: false, headerCssClass: "prKeyHeadColumn", cssClass: "numericCell", formatter: NumberFormatter },
 	    { name: "Engine-size (cm3)", field: "engine-size", id: "engine-size", sortable: true, width: 115, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell"},
 	    { name: "Length (cm)", field: "length", id: "length", sortable: true, width: 80,resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell" },
+	    { name: "Fuel System", field: "fuel-system", id: "fuel-system", sortable: true, width: 90, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell", formatter:FuelFormatter},
 	    { name: "Horsepower", field: "horsepower", id: "horsepower", sortable: true, width: 90, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell"},
 	    { name: "Width (cm)", field: "width", id: "width", sortable: true, width: 80, resizable: false  , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell"},
 	    { name: "Price ($)", field: "price", id: "price", sortable: true, width: 65, resizable: false , headerCssClass: "prKeyHeadColumn", cssClass: "numericCell", formatter: NumberFormatter}
@@ -21,7 +23,7 @@ window.dataTable = function(id, data, columns, colors, callback_highlight){
         enableColumnReorder : true,
       };
 
-	var grid = new Slick.Grid("#" + id, _data, columns2, options)
+	var grid = new Slick.Grid("#" + id, _data, columns2, options);
 
 	grid.onSort.subscribe(function (e, args) {
     	var field = args.sortCol.field;
@@ -38,11 +40,11 @@ window.dataTable = function(id, data, columns, colors, callback_highlight){
 
 	grid.onMouseEnter.subscribe(function(e,args) {
 		var selected = grid.getCellFromEvent(e).row;
-		callback_highlight(_data[selected]);
+		// callback_highlight(_data[selected]);
     });
 
 	grid.onMouseLeave.subscribe(function(e,args) {
-		callback_highlight(undefined);
+		// callback_highlight(undefined);
     });
 
     function MakeFormatter(row, cell, value, columnDef, dataContext) {

@@ -1,145 +1,149 @@
-/* D3 */
 
-/* LEGEND */
-circle {
-    border-radius: 100%;
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
+.parcoords {
+    display: block;
+}
+
+.parcoords svg,
+.parcoords canvas {
+    font: 10px sans-serif;
+    position: absolute;
+}
+
+.parcoords canvas {
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.axis .title {
+    font-size: 10px;
+    fill: #222;
+    transform: rotate(-15deg) translate(-5px, -20px);
+}
+
+
+.axis line,
+.axis path {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+
+.axis .tick text {
+    fill: #222;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.axis.manufac_name .tick text,
+.axis.food_group .tick text {
+    opacity: 1;
+}
+
+/*wrapper element so column padding doesn't affect fixed header background*/
+.scroll-window-wrapper {
+    position: relative;
+}
+
+/* element containing the table */
+.scroll-window {
+    height: 20rem;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.scroll-window table {
+    margin-bottom: 0;
+}
+
+/*fixed header background*/
+.scroll-window:before {
+    content: "";
+    position: absolute;
     width: 100%;
-    stroke: black;
-    stroke-width: 1;
+    height: 2.5rem;
+    display: table;
+    z-index: 10;
+    background: rgba(170, 170, 170, 0.8);
 }
 
-.legend_text {
-    font-size: 12px;
-    text-transform: capitalize;
+/*the actual fixed header*/
+table.fixed-header th div {
+    position: absolute;
+    margin-top: -.5rem;
+    z-index: 11;
+    color: #333;
 }
 
-/* PIE */
-.pie {
-  text-align: center;
-  opacity: 0.95;
+table.fixed-header thead th {
+    height: 2.5rem;
+    width: 30px;
 }
 
-/* TOOLTIP  */
-.tooltip {
-  display: block;
-  font-size: 12px;  
-  outline:none;
-  text-decoration:none;
-  display:inline; 
-  position:absolute; 
-  color:#111;
-  border:1px 
-  solid #DCA; 
-  background:#fffAF0;
-  z-index:10;
-  display:none; 
-  padding:14px 20px;
-  margin-top:-30px; 
-  margin-left:28px;
-  width:170px; 
-  line-height:16px;
+.user-list {
+    width: 100%;
 }
 
-/* Parallel Coordinates */
-#pcp .axis,
-#pcp .axis-data,
-#pcp .axis-filter {
-  position: absolute;
-  display: block;
+.user-list td.text-right {
+    width: 16rem;
 }
 
-#pcp .axis {
-  width: 40px;
-  background: rgba(55,55,255,0);
-  -webkit-transition: background 300ms ease-in 200ms;
-  -moz-transition: background 300ms ease-in 200ms;
-  -o-transition: background 300ms ease-in 200ms;
-  transition: background 300ms ease-in 200ms;
-}
-#pcp .dimension:hover {
-  font-weight:bold;
+/*-----experimental scrollbar styles-----*/
+/* line 199, ../scss/main.scss */
+#bodywrap ::-webkit-scrollbar {
+    width: 1rem;
 }
 
-/* SVG Paralllel Coordinates */
-#pcp {
-  width: 100%; 
-  margin: 0 auto;
-  margin-bottom: 20px;
+/* line 202, ../scss/main.scss */
+#bodywrap ::-webkit-scrollbar-button {
+    /* width:1rem;*/
 }
 
-.background path {
-  display: none;
-  fill: none;
-  stroke: #d4d4d4;
-  stroke-opacity: 1;
-  shape-rendering: crispEdges;
+/* line 205, ../scss/main.scss */
+#bodywrap ::-webkit-scrollbar-track {
+    background-color: #eaeaea;
+    border-left: 1px solid #ccc;
 }
 
-.foreground path,
-.highlight path {
-  fill: none;
-  stroke-width: 1.5;
-  stroke-opacity: .2;
+/* line 212, ../scss/main.scss */
+#bodywrap ::-webkit-scrollbar-thumb {
+    background-color: #ccc;
 }
 
-.highlight path {
-  stroke-opacity: 1;
+/* line 215, ../scss/main.scss */
+#bodywrap ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+.axis:hover .title {
+    font-weight: bold;
+}
+
+.axis:hover .tick text {
+    /*opacity: 1;*/
+}
+
+.axis.active .title {
+    font-weight: bold;
+}
+
+.axis.active .tick text {
+    opacity: 1;
+    font-weight: bold;
 }
 
 .brush .extent {
-  fill-opacity: .2;
-  stroke: #fff;
-  shape-rendering: crispEdges;
+    fill-opacity: .3;
+    stroke: #fff;
+    stroke-width: 1px;
 }
 
-.axis line, .axis path {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+pre {
+    width: 100%;
+    height: 300px;
+    margin: 6px 12px;
+    tab-size: 40;
+    font-size: 10px;
+    overflow: auto;
 }
 
-.axis text {
-  font-size: 12px;  
-  text-shadow:
-   -1px -1px 0 #fff,
-    1px -1px 0 #fff,
-   -1px 1px 0 #fff,
-    1px 1px 0 #fff;
-  cursor: move;
-}
-
-/* SLICK GRID - TABLE*/
-#data-table {
-  width: 100% ;
-  height: 270px;
-  margin-bottom: 10px;
-}
-.slick-header-column.ui-state-default {
-  font-weight:bold;
-  cursor: pointer;
-  border-right: 1px solid #bbb;
-  font-size: 12px;
-  height: 40px;
-}
-
-.slick-cell {
-  border: none ;
-}
-.slick-row.odd {
-  background: rgba(0,0,0,0.05);
-}
-.slick-row:hover {
-  font-weight:bold;
-  background: #ddd;
-}
-
-.prKeyHeadColumn {
-  color: #FFF;
-  background: #CC333F;
-}
-.numericCell{
-  text-align: right;
-}
+/* D3 */
