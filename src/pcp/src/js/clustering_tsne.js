@@ -42,7 +42,7 @@ function clusterKMeans(data, numclusters) {
 function reduceDimTSNE(data) {
     var opt = {};
     opt.epsilon = 10; // epsilon is learning rate (10 = default)
-    opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
+    opt.perplexity = 20; // roughly how many neighbors each point influences (30 = default)
     opt.dim = 2; // dimensionality of the embedding (2 = default)
 
     var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
@@ -64,19 +64,20 @@ function reduceDimTSNE(data) {
    @param clusters: [Int], containing a list of cluster assignments
    @return [{x:,y:,category:}], list of objects containing the coordinates and category of a point
    */
-function toObjects(tsne_array, clusters) {
+function toObjects(tsne_array, clusters, data) {
     var objects = [];
     var ob = {};
     for (i = 0; i < tsne_array.length; i++) {
         ob = {x:tsne_array[i][0], y:tsne_array[i][1], category:clusters[i]};
-        objects.push(ob);
+        ob2 = Object.assign(ob, data[i]);
+        objects.push(ob2);
     }
     return objects;
 }
 
 /// Example workflow
 // Work out thew datapoints
-//var data_boats = toNestedArray(boat_data['boats']);
+//var data_boats = toNestedArray(data);
 //var reduced_tsne = reduceDimTSNE(data_boats);
 //var clusters = clusterKMeans(data_boats);
 //var tsne_clusters = toObjects(reduced_tsne, clusters);

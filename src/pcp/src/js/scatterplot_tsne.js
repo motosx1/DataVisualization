@@ -1,6 +1,10 @@
 function drawScatterplot(data) {
+    console.log(data)
+    var chart = d3.select('#tsne-div'),
+        targetWidth = chart.node().getBoundingClientRect().width;
+
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = 960 - margin.left - margin.right,
+        width = targetWidth - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
     var xScale = d3.scaleLinear()
@@ -19,8 +23,8 @@ function drawScatterplot(data) {
     var yAxis = d3.axisLeft()
         .scale(yScale);
 
-    var svg = d3.select("#clustering")
-        .attr("width", width + margin.left + margin.right)
+    var svg = d3.select("#tsne")
+        .attr("width", targetWidth)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -54,7 +58,38 @@ function drawScatterplot(data) {
         .attr("r", 3.5)
         .attr("cx", function(d) { return xScale(d.x); })
         .attr("cy", function(d) { return yScale(d.y); })
-        .style("fill", function(d) { return color(d.category); });
+        .style("fill", function(d) { return color(d.category); })
+        .on('mouseover', function (d) {
+            var transitionTime = 100;
+
+            svg.append('text')
+                .transition()
+                .attr("class", "tip")
+                .delay(transitionTime - 0.4 * transitionTime)
+                .text("make: " + d.make
+                      + ", fuel type: " + d['fuel-type']
+                      + ", horsepower: " + d.horsepower
+                      + ", city mpg: " + d['city-mpg']
+                      + ", price: " + d.price)
+                .attr("x", 10)
+                .attr("y", 10);
+
+            d3.select(this)
+                .transition()
+                .duration(transitionTime)
+                .attr("r", 10);
+        })
+        .on('mouseout', function (d) {
+            var transitionTime = 100;
+
+            svg.selectAll("text").filter(".tip")
+                .remove();
+
+            d3.select(this)
+                .transition()
+                .duration(transitionTime)
+                .attr("r", 4);
+        });
 
     var legend = svg.selectAll(".legend")
         .data(color.domain())

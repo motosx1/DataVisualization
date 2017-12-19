@@ -78,7 +78,7 @@ Main.prototype = {
         var initial_array = toNestedArray(self._data);
         var reduced_tsne = reduceDimTSNE(initial_array);
         var clusters = clusterKMeans(initial_array);
-        var tsne_clusters = toObjects(reduced_tsne, clusters);
+        var tsne_clusters = toObjects(reduced_tsne, clusters, self._data);
         drawScatterplot(tsne_clusters);
 
         self._data.forEach(function (p, i) {
@@ -109,7 +109,7 @@ Main.prototype = {
         // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
         // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
         // self._dataTable = dataTable("data-table", self._data, dimensions, self._colors, self._pcp.highlight_single)
-        self._dataTable = dataTable("data-table", self._data, dimensions, self._colors)
+        self._dataTable = dataTable("data-table", self._data, dimensions, self._colors);
     },
 
     callback_applyBrushFilter: function (brushed_data) {
@@ -140,7 +140,7 @@ Main.prototype = {
         self.refreshCharts();
         return hide;
     },
-}
+};
 
 function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
