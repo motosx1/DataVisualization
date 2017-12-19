@@ -1,4 +1,4 @@
-function drawScatterplot(data) {
+function drawScatterplot(data, color_function, color_domain) {
     var chart = d3.select("#headingThree"),
         targetWidth = chart.node().getBoundingClientRect().width;
 
