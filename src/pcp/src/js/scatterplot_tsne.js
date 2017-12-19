@@ -1,5 +1,4 @@
 function drawScatterplot(data) {
-    console.log(data)
     var chart = d3.select('#tsne-div'),
         targetWidth = chart.node().getBoundingClientRect().width;
 
