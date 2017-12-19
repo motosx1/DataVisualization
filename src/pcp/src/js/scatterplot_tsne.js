@@ -1,4 +1,4 @@
-function drawScatterplot(data) {
+function drawScatterplot(data, color_function, color_domain) {
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
@@ -11,7 +11,7 @@ function drawScatterplot(data) {
         .domain(d3.extent(data, function(d) { return d.y; })).nice()
         .range([height, 0]);
 
-    var color = d3.scaleOrdinal(d3.schemeCategory20);
+    // var color = d3.scaleOrdinal(d3.schemeCategory20);
 
     var xAxis = d3.axisBottom()
         .scale(xScale);
@@ -54,10 +54,10 @@ function drawScatterplot(data) {
         .attr("r", 3.5)
         .attr("cx", function(d) { return xScale(d.x); })
         .attr("cy", function(d) { return yScale(d.y); })
-        .style("fill", function(d) { return color(d.category); });
+        .style("fill", function(d) { return color_function(d.category); });
 
     var legend = svg.selectAll(".legend")
-        .data(color.domain())
+        .data(color_domain)
         .enter().append("g")
         .attr("class", "legend")
         .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -66,12 +66,12 @@ function drawScatterplot(data) {
         .attr("x", width - 18)
         .attr("width", 18)
         .attr("height", 18)
-        .style("fill", color);
+        .style("fill", function(d,i) { return color_function(i); });
 
     legend.append("text")
         .attr("x", width - 24)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function(d) { return d; });
+        .text(function(d, i) { return "Category "+(i+1); });
 }

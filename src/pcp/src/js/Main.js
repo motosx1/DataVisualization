@@ -79,39 +79,29 @@ Main.prototype = {
         var reduced_tsne = reduceDimTSNE(initial_array);
         var clusters = clusterKMeans(initial_array);
         var tsne_clusters = toObjects(reduced_tsne, clusters);
-        drawScatterplot(tsne_clusters);
+        var c = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'red'];
 
-        var color = d3.scaleOrdinal(d3.schemeCategory20);
+        var color = function (i) {
+            // var c = ['#66c2a5', '#fc8d62', '#8ad0cb'];
+            return c[i%3];
+        }
 
         self._data.forEach(function (p, i) {
             p['category'] = color(tsne_clusters[i]['category']);
         });
+        drawScatterplot(tsne_clusters, color, c);
 
 
     },
 
     setupCharts: function () {
-        // var dimensions = ['make',
-        //     'fuel-type',
-        //     'length',
-        //     'width',
-        //     'weight',
-        //     'cylinders',
-        //     'engine-size',
-        //     'fuel-system',
-        //     'compression',
-        //     'horsepower',
-        //     'city-mpg',
-        //     'highway-mpg',
-        //     'price'];
 
-        // self._stats = stats(self._data);
         self._pcp = parallelCoordinatesChart2("pcp", self._data, self._colors, null, null);
         // self._legend = legendChart("legend", self._data_selected, self._colors, self.callback_applyGroupFilter)
         // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
         // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
         // self._dataTable = dataTable("data-table", self._data, dimensions, self._colors, self._pcp.highlight_single)
-        self._dataTable = dataTable("data-table", self._data, dimensions, self._colors)
+        self._dataTable = dataTable("data-table", self._data, null, self._colors)
     },
 
     callback_applyBrushFilter: function (brushed_data) {
