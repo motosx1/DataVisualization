@@ -12,22 +12,24 @@
 
     <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>-->
     <link rel="stylesheet" href="src/css/charts.css"/>
-    <!--<link rel="stylesheet" href="src/css/grid.css">-->
-    <!--<link rel="stylesheet" href="src/css/styles.css">-->
     <link rel="icon" type="image/png" href="src/images/favicon.ico">
 
     <!-- Lib dependencies -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
-    <!--<script src="lib/d3/d3.min.js"></script>-->
     <script src="lib/underscore/underscore.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+
+    </style>
 
     <script type="text/javascript" src="lib/density_clustering.js"></script>
     <script type="text/javascript" src="lib/tsne.js"></script>
 
-    <!-- Slick styles-->
-    <!--<link href="lib/slick/slick.grid.css" rel="stylesheet" />-->
-    <!--<link href="lib/slick/slick-default.theme.css" rel="stylesheet" />-->
 
     <!-- Slick dependencies -->
     <script src="lib/slick/lib/jquery-1.7.min.js"></script>
@@ -51,47 +53,92 @@
     <script src="src/js/clustering_tsne.js"></script>
     <script src="src/js/Main.js"></script>
 
-    <!-- Charts CSS -->
-    <!--<link href="src/css/charts.css" rel="stylesheet">-->
 </head>
 <body>
 
 
 
-<div id="pcp_chart">
 
-</div>
-
-<!--<div id="table" class="scroll-window">-->
-
-<!--</div>-->
-
+<div class="container-fluid text-center">
+    <div class="row content">
+        <div class="col-sm-1 ">
+        </div>
+        <div class="col-sm-10 text-left">
 
 
+            <div id="accordion" role="tablist" aria-multiselectable="false">
+                <div class="card">
+                    <div class="card-header" role="tab" id="headingOne">
+                        <h5 class="mb-0">
+                            <a data-toggle="collapse" href="#collapseOne" aria-expanded="false"
+                               aria-controls="collapseOne">
+                                PCP
+                            </a>
+                        </h5>
+                    </div>
 
-<div id="bodywrap">
-    <div class="row">
-        <div class="large-10 columns">
-            <div class="scroll-window-wrapper">
+                    <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="card-block">
+                            <div id="pcp_chart">
 
-                <div id="table" class="scroll-window">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header" role="tab" id="headingTwo">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false"
+                               aria-controls="collapseTwo">
+                                Table
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="card-block">
+                            <div id="table" class="scroll-window">
 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header" role="tab" id="headingThree">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false"
+                               aria-controls="collapseThree">
+                                Scatterplot matrix
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="card-block">
+                            <div>
+                                <svg id="vis"></svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="col-sm-1 ">
+        </div>
     </div>
+
+
 </div>
 
 
-
-<div>
-    <svg id="vis"></svg>
-</div>
-
-
-<script src="lib/jquery.min.js"></script>
+<!--<script src="lib/jquery.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
 <script type="text/javascript">
     var main = new Main();
+
 </script>
 </body>
 </html>
