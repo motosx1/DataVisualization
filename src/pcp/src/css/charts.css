@@ -89,6 +89,40 @@ table.fixed-header thead th {
     width: 30px;
 }
 
+table {
+    width: 100%;
+}
+
+thead, tbody, tr, td, th { display: block; }
+
+tr:after {
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+thead th {
+    height: 50px;
+
+    /*text-align: left;*/
+}
+
+tbody {
+    height: 520px;
+    overflow-y: auto;
+}
+
+thead {
+    /* fallback */
+}
+
+
+tbody td, thead th {
+    width: 7.6%;
+    float: left;
+}
+
 .data-table-head-div-even {
     transform: rotate(-15deg) translate(0px, -20px);
 
