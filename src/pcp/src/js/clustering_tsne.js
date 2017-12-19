@@ -1,5 +1,17 @@
 function toNestedArray(data) {
-    return data.map(x => [x['x'], x['y'], x['u'], x['v'], x['m'], x['a']]);
+    var ret = data.map(x => [
+        x['length'],
+        x['width'],
+        x['weight'],
+        x['cylinders'],
+        x['engine-size'],
+        x['compression'],
+        x['horsepower'],
+        x['city-mpg'],
+        x['price']
+    ]);
+
+    return ret;
 }
 
 /* Clusters the data in the given amount of clusters.
@@ -64,10 +76,9 @@ function toObjects(tsne_array, clusters) {
 
 /// Example workflow
 // Work out thew datapoints
-var data_boats = toNestedArray(boat_data['boats']);
-var reduced_tsne = reduceDimTSNE(data_boats);
-var clusters = clusterKMeans(data_boats);
-var tsne_clusters = toObjects(reduced_tsne, clusters);
+//var data_boats = toNestedArray(boat_data['boats']);
+//var reduced_tsne = reduceDimTSNE(data_boats);
+//var clusters = clusterKMeans(data_boats);
+//var tsne_clusters = toObjects(reduced_tsne, clusters);
 
-// plot the data
-drawScatterplot(tsne_clusters);
+//drawScatterplot(tsne_clusters);
