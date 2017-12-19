@@ -81,8 +81,10 @@ Main.prototype = {
         var tsne_clusters = toObjects(reduced_tsne, clusters);
         drawScatterplot(tsne_clusters);
 
+        var color = d3.scaleOrdinal(d3.schemeCategory20);
+
         self._data.forEach(function (p, i) {
-            p['category'] = tsne_clusters[i]['category'];
+            p['category'] = color(tsne_clusters[i]['category']);
         });
 
 

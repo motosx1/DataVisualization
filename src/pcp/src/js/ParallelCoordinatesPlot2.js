@@ -262,9 +262,14 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
         output.text("");
         var thead = output.append("thead");
         var tr = thead.append("tr");
-        dimensions.forEach(function (dim) {
+        dimensions.forEach(function (dim, i) {
             var th = tr.append("th");
-            th.append("div").text(dim.key);
+            th.append("div")
+            // .attr("class", "data-table-head-div")
+                .attr("class", function (d) {
+                    return i % 2 === 0 ? "data-table-head-div-even" : "data-table-head-div-odd";
+                })
+                .text(dim.description);
         });
         var tbody = output.append("tbody");
         dataToDisplay.forEach(function (d) {
@@ -291,7 +296,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
     }
 
     function getColor(i) {
-        var color = d3.schemeCategory20;
+        // var color = d3.schemeCategory20;
         return color[i];
         // return color[Math.floor(Math.random() * (20 + 1))];
     }
@@ -300,7 +305,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
         ctx.beginPath();
         var coords = project(d);
         coords.forEach(function (p, i) {
-            ctx.strokeStyle = getColor(p[2]);
+            ctx.strokeStyle = p[2];
             // this tricky bit avoids rendering null values as 0
             if (p === null) {
                 // this bit renders horizontal lines on the previous/next
