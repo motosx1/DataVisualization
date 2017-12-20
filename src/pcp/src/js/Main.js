@@ -82,7 +82,6 @@ Main.prototype = {
         var c = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'red'];
 
         var color = function (i) {
-            // var c = ['#66c2a5', '#fc8d62', '#8ad0cb'];
             return c[i%3];
         }
 
@@ -101,7 +100,7 @@ Main.prototype = {
         // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
         // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
         // self._dataTable = dataTable("data-table", self._data, dimensions, self._colors, self._pcp.highlight_single)
-        self._dataTable = dataTable("data-table", self._data, null, self._colors)
+        // self._dataTable = dataTable("data-table", self._data, null, self._colors)
     },
 
     callback_applyBrushFilter: function (brushed_data) {
