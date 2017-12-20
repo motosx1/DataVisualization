@@ -75,7 +75,7 @@ Main.prototype = {
             p['tsne-y'] = tsne_clusters[i].y;
         });
 
-        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_blind : self.c_normal;
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_normal : self.c_blind;
         initTsneScatter(self._data, self.color, colorScheme);
         drawScatterplot(self._data, self.color, colorScheme);
 
@@ -85,7 +85,7 @@ Main.prototype = {
     },
 
     color: function (i) {
-        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_blind : self.c_normal;
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_normal : self.c_blind;
         return colorScheme[i % 3];
     },
 
@@ -97,7 +97,7 @@ Main.prototype = {
 
         changeToNewSchemeScatterPlot();
         updateParallelCoordinatesChart(self._data);
-        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_blind : self.c_normal;
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_normal : self.c_blind;
 
         updateScatterplot(self._data, self.color, colorScheme);
     },
