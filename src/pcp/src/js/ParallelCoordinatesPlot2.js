@@ -1,4 +1,4 @@
-window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, types) {
+window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
     // var original_data = data;
     // var parallelCoordinatesChart = {};
 
@@ -366,6 +366,7 @@ window.parallelCoordinatesChart2 = function (idx, data, colors, dimensions, type
         render(selected);
 
         drawTable(selected);
+        select_callback(selected);
         // output.text(d3.tsvFormat(selected.slice(0, 24)));
     }
 
