@@ -1,17 +1,36 @@
-function drawScatterplot(data, color_function, color_domain) {
+function updateScatterplot(data, color_function, color_domain) {
+    d3.select('#vis').selectAll('.dot').remove();
+    drawScatterplot(data, color_function, color_domain);
+}
+
+var xScale;
+var yScale;
+var svg;
+
+function initTsneScatter(data, color_function, color_domain) {
+
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-    var xScale = d3.scaleLinear()
-        .domain(d3.extent(data, function(d) { return d.x; })).nice()
+
+    svg = d3.select("#vis")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    xScale = d3.scaleLinear()
+        .domain(d3.extent(data, function (d) {
+            return d['tsne-x'];
+        })).nice()
         .range([0, width]);
 
-    var yScale = d3.scaleLinear()
-        .domain(d3.extent(data, function(d) { return d.y; })).nice()
+    yScale = d3.scaleLinear()
+        .domain(d3.extent(data, function (d) {
+            return d['tsne-y'];
+        })).nice()
         .range([height, 0]);
-
-    // var color = d3.scaleOrdinal(d3.schemeCategory20);
 
     var xAxis = d3.axisBottom()
         .scale(xScale);
@@ -19,11 +38,6 @@ function drawScatterplot(data, color_function, color_domain) {
     var yAxis = d3.axisLeft()
         .scale(yScale);
 
-    var svg = d3.select("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     svg.append("g")
         .attr("class", "x axis")
@@ -47,31 +61,49 @@ function drawScatterplot(data, color_function, color_domain) {
         .style("text-anchor", "end")
         .text("Sepal Length (cm)");
 
-    svg.selectAll(".dot")
-        .data(data)
-        .enter().append("circle")
-        .attr("class", "dot")
-        .attr("r", 3.5)
-        .attr("cx", function(d) { return xScale(d.x); })
-        .attr("cy", function(d) { return yScale(d.y); })
-        .style("fill", function(d) { return color_function(d.category); });
-
     var legend = svg.selectAll(".legend")
         .data(color_domain)
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        .attr("transform", function (d, i) {
+            return "translate(0," + i * 20 + ")";
+        });
 
     legend.append("rect")
         .attr("x", width - 18)
         .attr("width", 18)
         .attr("height", 18)
-        .style("fill", function(d,i) { return color_function(i); });
+        .style("fill", function (d, i) {
+            return color_function(i);
+        });
 
     legend.append("text")
         .attr("x", width - 24)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function(d, i) { return "Category "+(i+1); });
+        .text(function (d, i) {
+            return "Category " + (i + 1);
+        });
+}
+
+function drawScatterplot(data) {
+
+
+    svg.selectAll(".dot")
+        .data(data)
+        .enter().append("circle")
+        .attr("class", "dot")
+        .attr("r", 3.5)
+        .attr("cx", function (d) {
+            return xScale(d['tsne-x']);
+        })
+        .attr("cy", function (d) {
+            return yScale(d['tsne-y']);
+        })
+        .style("fill", function (d) {
+            return d['category'];
+        });
+
+
 }
