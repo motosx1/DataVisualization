@@ -1,5 +1,8 @@
 function updateScatterplot(data, color_function, color_domain) {
     d3.select('#vis').selectAll('.dot').remove();
+    d3.selectAll(".rect").style("fill", function (d, i) {
+        return color_function(i);
+    });
     drawScatterplot(data, color_function, color_domain);
 }
 
