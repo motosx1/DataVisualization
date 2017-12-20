@@ -14,8 +14,10 @@ function Main() {
     self._dataTable = null;
     self._stats = null;
 
-    self.c = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'red'];
+    self.c_normal = ['#e41a1c', '#377eb8', '#4daf4a'];
+    self.c_blind = ['#1b9e77', '#d95f02', '#7570b3'];
 
+    self.colorBlindFlag = false;
 
     self.init();
 }
@@ -51,6 +53,11 @@ Main.prototype = {
     },
 
     setupCharts: function () {
+
+        $("#colorblindbutton").click(function () {
+            self.colorBlindFlag = !self.colorBlindFlag;
+        });
+
         var initial_array = toNestedArray(self._data);
         var reduced_tsne = reduceDimTSNE(initial_array);
         var clusters = clusterKMeans(initial_array);
@@ -62,7 +69,8 @@ Main.prototype = {
             p['tsne-y'] = tsne_clusters[i].y;
         });
 
-        initTsneScatter(self._data, self.color, self.c);
+        var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
+        initTsneScatter(self._data, self.color, colorScheme);
         drawScatterplot(self._data);
 
         self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
@@ -71,22 +79,29 @@ Main.prototype = {
     },
 
     color: function (i) {
-        return self.c[i % 3];
+        var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
+        return colorScheme[i % 3];
     },
 
+
     callback_updateCharts: function (selected_data, source_name) {
+        var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
         switch (source_name.toUpperCase()) {
             case "PCP":
-                updateScatterplot(selected_data, self.color, self.c);
+                updateScatterplot(selected_data, self.color, colorScheme);
                 selectDataByIndex(selected_data);
                 break;
             case "TSNE":
                 selectDataByIndex(selected_data);
                 break;
             case "SPM":
-                updateScatterplot(selected_data, self.color, self.c);
+                updateScatterplot(selected_data, self.color, colorScheme);
                 updateParallelCoordinatesChart(selected_data);
                 break;
+            default:
+                updateScatterplot(selected_data, self.color, colorScheme);
+                updateParallelCoordinatesChart(selected_data);
+                selectDataByIndex(selected_data);
 
         }
     }
