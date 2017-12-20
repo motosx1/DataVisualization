@@ -33,6 +33,8 @@ var mainData;
 
 var baseLeftOffset = 40;
 
+var updateCallback;
+
 function getDomainAndFeatureNr(data, excludedFeatures) {
 
 	/* Initiate a domain variable */
@@ -104,7 +106,7 @@ function createBins(data, featureNames, binNumber) {
 	return bins;
 }
 
-window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFeatures = []) {
+window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures = [], excludedFeatures = []) {
 	/* remove what was previously in this SVG */
 	d3.select("#plotSVG").remove();
 
@@ -113,6 +115,8 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
     rescaleCoords(selectedFeatures.length);
     //addButtons(selectedFeatures);
     totalFeatures = selectedFeatures;
+
+    updateCallback = callback;
 
 	//console.log("HERE");
 	//console.log(data);
@@ -233,13 +237,24 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
         //console.log("" + e);
         //console.log(p.iName + " " + p.jName);
 
-        if (!e)
+        if (!e) {
             svg.selectAll(".circle").classed("hidden", false);
-        else
-			svg.selectAll(".circle").classed("hidden", function (d) {
-				return e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0]
-					|| e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
-			});
+
+            updateCallback([], "SPM");
+        } else {
+        	var returnedData = [];
+
+            svg.selectAll(".circle").classed("hidden", function (d) {
+            	var res = e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0] ||
+				          e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
+                if (!res)
+                	returnedData.push(d);
+
+            	return res;
+            });
+
+            updateCallback(returnedData, "SPM");
+        }
 
     }
 
@@ -350,16 +365,6 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 
 }
 
-function resize() {
-  viewWidth = window.innerWidth;
-  viewHeight = window.innerHeight;
-
-  width = viewWidth - margin.left - margin.right - 50;
-  height = viewHeight - margin.top - margin.bottom - 50;
-
-  drawScatterplotMatrix(boats);
-}
-
 function getCommonSet(setA, setB) {
 	var finalSet = [];
 
@@ -380,48 +385,6 @@ function getCommonSet(setA, setB) {
 	return finalSet;
 }
 
-// $(function() {
-//
-//     d3.csv("./car_data.csv", function (d) {
-//         return {
-//             'make': d['make'],
-//             'fuel-type': d['fuel_type'],
-//             'length': +d['length'],
-//             'width': +d['width'],
-//             'weight': +d['curb_weight'],
-//             'cylinders': +d['num_of_cylinders'],
-//             'engine-size': +d['engine_size'],
-//             'fuel-system': d['fuel_system'],
-//             'compression': +d['compression_ratio'],
-//             'horsepower': +d['horsepower'],
-//             'city-mpg': +d['city_mpg'],
-//             'highway-mpg': +d['highway_mpg'],
-//             'price': +d['price']
-//         };
-//     }, function (data) {
-//
-//         boats = data;
-//
-//     });
-//
-//     console.log("Data: " + boats);
-//
-//     var totalFeatures = d3.keys(boats[0]);
-//
-//
-//
-//     console.log("The total features are: " + boats);
-//     //
-//     // for (var i = 0; i < totalFeatures.length; ++i) {
-// 		// var newElement = "<li onclick='elementSelected(this)' value='" + totalFeatures[i] + "' class = 'featureFont'>" + totalFeatures[i] + "</li>";
-//     //
-// 		// $("#features").append(newElement);
-//     // }
-//     //
-//     //
-//     // drawScatterplotMatrix(boats, totalFeatures);
-// });
-
 window.elementSelected = function(element) {
 	var value = element.getAttribute("value");
     var index = totalFeatures.indexOf(value);
@@ -440,7 +403,7 @@ window.elementSelected = function(element) {
 
 	//console.log(totalFeatures);
 
-    drawScatterplotMatrix(mainData, totalFeatures);
+    drawScatterplotMatrix(mainData, updateCallback, totalFeatures);
 }
 
 
@@ -462,6 +425,26 @@ window.getFeatureNames = function(data) {
 	console.log("Names: " + finalKeys);
 
 	return finalKeys;
+};
+
+window.getFeatureNames = function(data, excluded) {
+    var myKeys = d3.keys(data[0]);
+    var finalKeys = [];
+
+    for (var i = 0; i < myKeys.length; ++i) {
+
+        var type = typeof data[0][myKeys[i]];
+
+        console.log("Type:" + type);
+
+        if (type !== "string" && !excluded.includes(myKeys[i]))
+            finalKeys.push(myKeys[i]);
+
+    }
+
+    console.log("Names: " + finalKeys);
+
+    return finalKeys;
 };
 
 window.addButtons = function(featureNames) {

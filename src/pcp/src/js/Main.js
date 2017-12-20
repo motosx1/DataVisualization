@@ -72,17 +72,29 @@ Main.prototype = {
         newData.forEach(function(d) {delete d['tsne-x']; delete d['tsne-y'];});
         // console.log("The new Data:" + newData);
 
-        self._scatterPlot = drawScatterplotMatrix(newData, getFeatureNames(newData));
-        addButtons(getFeatureNames(newData));
+
+        self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
+        addButtons(getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
     },
 
     color: function (i) {
         return self.c[i % 3];
     },
 
-    callback_updateCharts: function (selected_data) {
-        updateScatterplot(selected_data, self.color, self.c);
-        selectDataByIndex(selected_data);
+    callback_updateCharts: function (selected_data, source_name) {
+        switch (source_name.toUpperCase()) {
+            case "PCP":
+                updateScatterplot(selected_data, self.color, self.c);
+                selectDataByIndex(selected_data);
+                break;
+            case "TSNE":
+                selectDataByIndex(selected_data);
+                break;
+            case "SPM":
+                updateScatterplot(selected_data, self.color, self.c);
+                break;
+
+        }
     }
 
 

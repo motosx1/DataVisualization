@@ -366,7 +366,7 @@ window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
         render(selected);
 
         drawTable(selected);
-        select_callback(selected);
+        select_callback(selected, "PCP");
         // output.text(d3.tsvFormat(selected.slice(0, 24)));
     }
 
