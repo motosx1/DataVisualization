@@ -66,13 +66,6 @@ Main.prototype = {
         drawScatterplot(self._data);
 
         self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
-
-        // Filter out the data which should not be plotted
-        var newData = JSON.parse(JSON.stringify(self._data));
-        newData.forEach(function(d) {delete d['tsne-x']; delete d['tsne-y'];});
-        // console.log("The new Data:" + newData);
-
-
         self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
         addButtons(getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
     },
@@ -92,15 +85,11 @@ Main.prototype = {
                 break;
             case "SPM":
                 updateScatterplot(selected_data, self.color, self.c);
-                updateParallelCoordinatesChart("pcp", selected_data, self.callback_updateCharts);
+                updateParallelCoordinatesChart(selected_data);
                 break;
 
         }
     }
 
 
-}
-
-function capitalize(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
 }

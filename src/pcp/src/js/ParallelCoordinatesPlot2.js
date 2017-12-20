@@ -51,16 +51,12 @@ function draw(d) {
 }
 
 
-function updateParallelCoordinatesChart(idx, data, select_callback) {
-    console.log("remove");
-    // d3.select("#pcp_chart").select('div').remove();
-
+function updateParallelCoordinatesChart( data) {
     var render = renderQueue(draw);
 
     ctx.clearRect(0, 0, width, height);
+    ctx.globalAlpha = d3.min([0.85 / Math.pow(data.length, 0.3), 1]);
     render(data);
-
-    // parallelCoordinatesChart(idx, data, select_callback);
 }
 
 function parallelCoordinatesChart(idx, data, select_callback) {
@@ -249,9 +245,6 @@ function parallelCoordinatesChart(idx, data, select_callback) {
             return "translate(" + xscale(i) + ")";
         });
 
-    // d3.csv("car_data.csv", function (error, data) {
-    //     if (error) throw error;
-
     // shuffle the data!
     data = d3.shuffle(data);
 
@@ -379,12 +372,6 @@ function parallelCoordinatesChart(idx, data, select_callback) {
 
         drawTable(selected);
         select_callback(selected, "PCP");
-    }
-
-    function updatePCP(selected) {
-        render(selected);
-
-        drawTable(selected);
     }
 
 

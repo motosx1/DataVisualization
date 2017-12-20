@@ -242,18 +242,19 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 
             updateCallback([], "SPM");
         } else {
-        	var returnedData = [];
+        	var returnedData = new Set();
+
 
             svg.selectAll(".circle").classed("hidden", function (d) {
             	var res = e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0] ||
 				          e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
                 if (!res)
-                	returnedData.push(d);
+                	returnedData.add(d);
 
             	return res;
             });
 
-            updateCallback(returnedData, "SPM");
+            updateCallback(Array.from(returnedData), "SPM");
         }
 
     }
