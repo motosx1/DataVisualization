@@ -57,7 +57,6 @@ Main.prototype = {
 
         $("#colorblindbutton").click(function () {
             if ($("#colorblindbutton").hasClass("selected"))
-
                 $("#colorblindbutton").removeClass("selected");
             else
                 $("#colorblindbutton").addClass("selected");
@@ -76,9 +75,9 @@ Main.prototype = {
             p['tsne-y'] = tsne_clusters[i].y;
         });
 
-        var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_blind : self.c_normal;
         initTsneScatter(self._data, self.color, colorScheme);
-        drawScatterplot(self._data);
+        drawScatterplot(self._data, self.color, colorScheme);
 
         self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
         self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
@@ -86,7 +85,7 @@ Main.prototype = {
     },
 
     color: function (i) {
-        var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_blind : self.c_normal;
         return colorScheme[i % 3];
     },
 
@@ -95,9 +94,12 @@ Main.prototype = {
             d['category'] = self.c_map.get(d['category']);
         });
 
-        $("")
 
         changeToNewSchemeScatterPlot();
+        updateParallelCoordinatesChart(self._data);
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_blind : self.c_normal;
+
+        updateScatterplot(self._data, self.color, colorScheme);
     },
 
 

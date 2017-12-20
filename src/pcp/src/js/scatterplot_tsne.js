@@ -70,6 +70,7 @@ function initTsneScatter(data, color_function, color_domain) {
         });
 
     legend.append("rect")
+        .attr("class", "rect")
         .attr("x", width - 18)
         .attr("width", 18)
         .attr("height", 18)
@@ -85,10 +86,11 @@ function initTsneScatter(data, color_function, color_domain) {
         .text(function (d, i) {
             return "Category " + (i + 1);
         });
+
+
 }
 
 function drawScatterplot(data) {
-
 
     svg.selectAll(".dot")
         .data(data)

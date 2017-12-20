@@ -81,8 +81,6 @@ function updateParallelCoordinatesChart( data) {
 }
 
 function parallelCoordinatesChart(idx, data, select_callback) {
-    // var original_data = data;
-    // var parallelCoordinatesChart = {};
 
     var chart = d3.select('#headingOne');
     var targetWidth = chart.node().getBoundingClientRect().width;
@@ -93,8 +91,6 @@ function parallelCoordinatesChart(idx, data, select_callback) {
 
     var devicePixelRatio = window.devicePixelRatio || 1;
 
-    var color = d3.scaleOrdinal()
-        .range(["#5DA5B3", "#D58323", "#DD6CA7", "#54AF52", "#8C92E8", "#E15E5A", "#725D82", "#776327", "#50AB84", "#954D56", "#AB9C27", "#517C3F", "#9D5130", "#357468", "#5E9ACF", "#C47DCB", "#7D9E33", "#DB7F85", "#BA89AD", "#4C6C86", "#B59248", "#D8597D", "#944F7E", "#D67D4B", "#8F86C2"]);
 
 
     var types = {
@@ -332,8 +328,7 @@ function parallelCoordinatesChart(idx, data, select_callback) {
         .attr("x", -8)
         .attr("width", 16);
 
-    d3.selectAll(".axis.food_group .tick text")
-        .style("fill", color);
+
 
 
 
