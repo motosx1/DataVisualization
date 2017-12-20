@@ -59,9 +59,3 @@ function toObjects(reduced_tsne, clusters) {
     return objects;
 }
 
-// var data_boats = toNestedArray(boat_data['boats']);
-// var reduced_tsne = reduceDimTSNE(data_boats);
-// var clusters = clusterKMeans(data_boats);
-// var tsne_clusters = toObjects(reduced_tsne, clusters);
-//
-// drawScatterplot(tsne_clusters);

@@ -65,7 +65,7 @@ Main.prototype = {
         initTsneScatter(self._data, self.color, self.c);
         drawScatterplot(self._data);
 
-        self._pcp = parallelCoordinatesChart2("pcp", self._data, self.callback_updateCharts);
+        self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
 
         // Filter out the data which should not be plotted
         var newData = JSON.parse(JSON.stringify(self._data));
@@ -92,6 +92,7 @@ Main.prototype = {
                 break;
             case "SPM":
                 updateScatterplot(selected_data, self.color, self.c);
+                updateParallelCoordinatesChart("pcp", selected_data, self.callback_updateCharts);
                 break;
 
         }

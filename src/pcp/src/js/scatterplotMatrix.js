@@ -82,13 +82,13 @@ function createBins(data, featureNames, binNumber) {
 
 		var currentExtent = d3.extent(data, function(d) { return d[featureNames[i]]; });
 		//currentExtent = [Math.ceil(currentExtent[0] / 100) * 100, Math.ceil(currentExtent[1] / 100) * 100];
-        //console.log("Asd1: " + currentExtent);
+        ////console.log("Asd1: " + currentExtent);
 
         // Generate the thresholds
         currentExtent = d3.range(currentExtent[0], currentExtent[1],  Math.abs(currentExtent[1] - currentExtent[0]) / binNumber);
 
-        //console.log("Asd2: " + currentExtent);
-		//console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
+        ////console.log("Asd2: " + currentExtent);
+		////console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
 
 		bins.push(
 			d3
@@ -99,8 +99,8 @@ function createBins(data, featureNames, binNumber) {
 
 	}
 
-	//console.log("The bins");
-	//console.log(bins);
+	////console.log("The bins");
+	////console.log(bins);
 
 
 	return bins;
@@ -118,8 +118,8 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 
     updateCallback = callback;
 
-	//console.log("HERE");
-	//console.log(data);
+	////console.log("HERE");
+	////console.log(data);
 
 	/* Get some info on the data */
 	var res = getDomainAndFeatureNr(data, excludedFeatures);
@@ -138,7 +138,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
         .on("brush", brushMove)
         .on("end", brushEnd);
 
-    //console.log(res);
+    ////console.log(res);
 
     var distanceToBottom = scatterPlotSize * featureNumber;
 
@@ -146,7 +146,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
     bottomAxis.tickSize(-distanceToBottom);
 
 
-    console.log("The current distanceToBottom is " + distanceToBottom);
+    //console.log("The current distanceToBottom is " + distanceToBottom);
 
     /* Start adding elements */
     var svg = d3
@@ -234,8 +234,8 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
     function brushMove(p) {
         var e = d3.brushSelection(this);
 
-        //console.log("" + e);
-        //console.log(p.iName + " " + p.jName);
+        ////console.log("" + e);
+        ////console.log(p.iName + " " + p.jName);
 
         if (!e) {
             svg.selectAll(".circle").classed("hidden", false);
@@ -298,7 +298,7 @@ function cartesianProduct(featureSetA, featureSetB) {
 function plotCellAndPoints(caller, domains, data, p, bins) {
     var cell = d3.select(caller);
 
-    //console.log(cell);
+    ////console.log(cell);
 
     cell.append("rect")
         .attr("class", "frame")
@@ -360,7 +360,7 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 			.attr("x", 1)
 			.style("fill", "blue")
             .attr("width", function (d) { return scaleBottom(d.x1) - scaleBottom(d.x0) - 1})
-            .attr("height", function(d) { /*console.log("The scale of " + d.length + " " + scaleLeft(d.length));*/  return scaleLeft(d.length) - 10; });
+            .attr("height", function(d) { /*//console.log("The scale of " + d.length + " " + scaleLeft(d.length));*/  return scaleLeft(d.length) - 10; });
     }
 
 }
@@ -389,7 +389,7 @@ window.elementSelected = function(element) {
 	var value = element.getAttribute("value");
     var index = totalFeatures.indexOf(value);
 
-	//console.log(value);
+	////console.log(value);
 
 	if (index >= 0) {
         totalFeatures.splice(index, 1);
@@ -401,7 +401,7 @@ window.elementSelected = function(element) {
         $(element).removeClass("selected");
 	}
 
-	//console.log(totalFeatures);
+	////console.log(totalFeatures);
 
     drawScatterplotMatrix(mainData, updateCallback, totalFeatures);
 }
@@ -415,14 +415,14 @@ window.getFeatureNames = function(data) {
 
 		var type = typeof data[0][myKeys[i]];
 
-		console.log("Type:" + type);
+		//console.log("Type:" + type);
 
 		if (type !== "string")
             finalKeys.push(myKeys[i]);
 
 	}
 
-	console.log("Names: " + finalKeys);
+	//console.log("Names: " + finalKeys);
 
 	return finalKeys;
 };
@@ -435,14 +435,14 @@ window.getFeatureNames = function(data, excluded) {
 
         var type = typeof data[0][myKeys[i]];
 
-        console.log("Type:" + type);
+        //console.log("Type:" + type);
 
         if (type !== "string" && !excluded.includes(myKeys[i]))
             finalKeys.push(myKeys[i]);
 
     }
 
-    console.log("Names: " + finalKeys);
+    //console.log("Names: " + finalKeys);
 
     return finalKeys;
 };
@@ -472,7 +472,7 @@ window.selectDataByIndex = function(selectedData) {
 		.selectAll(".circle").classed("hidden", function (d) {
 		// Waaay too slow
     	// var res = selectedData.reduce(function(acc, e) {return acc || (e['id'] === d['id'])}, false);
-    	// console.log(res);
+    	// //console.log(res);
 
         return !set.has(d['id']);
     });

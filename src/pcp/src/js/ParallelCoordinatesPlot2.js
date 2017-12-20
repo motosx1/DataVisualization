@@ -1,4 +1,69 @@
-window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
+var ctx = null;
+var dimensions = null;
+var xscale = null;
+
+function project(d) {
+    return dimensions.map(function (p, i) {
+        // check if data element has property and contains a value
+        if (
+            !(p.key in d) ||
+            d[p.key] === null
+        ) return null;
+
+        return [xscale(i), p.scale(d[p.key]), d['category']];
+    });
+}
+
+
+function draw(d) {
+    ctx.beginPath();
+    var coords = project(d);
+    coords.forEach(function (p, i) {
+        ctx.strokeStyle = p[2];
+        // this tricky bit avoids rendering null values as 0
+        if (p === null) {
+            // this bit renders horizontal lines on the previous/next
+            // dimensions, so that sandwiched null values are visible
+            if (i > 0) {
+                var prev = coords[i - 1];
+                if (prev !== null) {
+                    ctx.moveTo(prev[0], prev[1]);
+                    ctx.lineTo(prev[0] + 6, prev[1]);
+                }
+            }
+            if (i < coords.length - 1) {
+                var next = coords[i + 1];
+                if (next !== null) {
+                    ctx.moveTo(next[0] - 6, next[1]);
+                }
+            }
+            return;
+        }
+
+        if (i === 0) {
+            ctx.moveTo(p[0], p[1]);
+            return;
+        }
+
+        ctx.lineTo(p[0], p[1]);
+    });
+    ctx.stroke();
+}
+
+
+function updateParallelCoordinatesChart(idx, data, select_callback) {
+    console.log("remove");
+    // d3.select("#pcp_chart").select('div').remove();
+
+    var render = renderQueue(draw);
+
+    ctx.clearRect(0, 0, width, height);
+    render(data);
+
+    // parallelCoordinatesChart(idx, data, select_callback);
+}
+
+function parallelCoordinatesChart(idx, data, select_callback) {
     // var original_data = data;
     // var parallelCoordinatesChart = {};
 
@@ -51,7 +116,7 @@ window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
         }
     };
 
-    var dimensions = [
+    dimensions = [
         {
             key: "make",
             description: "Make",
@@ -142,7 +207,7 @@ window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
     ];
 
 
-    var xscale = d3.scalePoint()
+    xscale = d3.scalePoint()
         .domain(d3.range(dimensions.length))
         .range([0, width]);
 
@@ -167,7 +232,7 @@ window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
         .style("margin-top", margin.top + "px")
         .style("margin-left", margin.left + "px");
 
-    var ctx = canvas.node().getContext("2d");
+    ctx = canvas.node().getContext("2d");
     ctx.globalCompositeOperation = 'darken';
     ctx.globalAlpha = 0.15;
     ctx.lineWidth = 1.5;
@@ -277,59 +342,6 @@ window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
 
     drawTable(data);
 
-    function project(d) {
-        return dimensions.map(function (p, i) {
-            // check if data element has property and contains a value
-            if (
-                !(p.key in d) ||
-                d[p.key] === null
-            ) return null;
-
-            return [xscale(i), p.scale(d[p.key]), d['category']];
-        });
-    }
-
-    function getColor(i) {
-        // var color = d3.schemeCategory20;
-        return color[i];
-        // return color[Math.floor(Math.random() * (20 + 1))];
-    }
-
-    function draw(d) {
-        ctx.beginPath();
-        var coords = project(d);
-        coords.forEach(function (p, i) {
-            ctx.strokeStyle = p[2];
-            ctx.strokeStyle
-            // this tricky bit avoids rendering null values as 0
-            if (p === null) {
-                // this bit renders horizontal lines on the previous/next
-                // dimensions, so that sandwiched null values are visible
-                if (i > 0) {
-                    var prev = coords[i - 1];
-                    if (prev !== null) {
-                        ctx.moveTo(prev[0], prev[1]);
-                        ctx.lineTo(prev[0] + 6, prev[1]);
-                    }
-                }
-                if (i < coords.length - 1) {
-                    var next = coords[i + 1];
-                    if (next !== null) {
-                        ctx.moveTo(next[0] - 6, next[1]);
-                    }
-                }
-                return;
-            }
-
-            if (i == 0) {
-                ctx.moveTo(p[0], p[1]);
-                return;
-            }
-
-            ctx.lineTo(p[0], p[1]);
-        });
-        ctx.stroke();
-    }
 
     function brushstart() {
         d3.event.sourceEvent.stopPropagation();
@@ -367,10 +379,14 @@ window.parallelCoordinatesChart2 = function (idx, data, select_callback) {
 
         drawTable(selected);
         select_callback(selected, "PCP");
-        // output.text(d3.tsvFormat(selected.slice(0, 24)));
     }
 
-    // });
+    function updatePCP(selected) {
+        render(selected);
+
+        drawTable(selected);
+    }
+
 
     function d3_functor(v) {
         return typeof v === "function" ? v : function () {
