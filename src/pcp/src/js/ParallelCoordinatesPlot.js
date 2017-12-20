@@ -2,6 +2,26 @@ var ctx = null;
 var dimensions = null;
 var xscale = null;
 
+
+function drawTable(dataToDisplay) {
+    d3.select("#tableDiv").select("table").remove();
+    var output = d3.select("#tableDiv").append("table").attr("class", "table table-striped");
+    output.text("");
+    var thead = output.append("thead");
+    var tr = thead.append("tr");
+    dimensions.forEach(function (dim, i) {
+        tr.append("th").text(dim.description);
+    });
+    var tbody = output.append("tbody");
+    dataToDisplay.forEach(function (d) {
+        tr = tbody.append("tr");
+        dimensions.forEach(function (dim) {
+            tr.append("td").text(d[dim.key]);
+        });
+
+    });
+}
+
 function project(d) {
     return dimensions.map(function (p, i) {
         // check if data element has property and contains a value
@@ -57,6 +77,7 @@ function updateParallelCoordinatesChart( data) {
     ctx.clearRect(0, 0, width, height);
     ctx.globalAlpha = d3.min([0.85 / Math.pow(data.length, 0.3), 1]);
     render(data);
+    drawTable(data);
 }
 
 function parallelCoordinatesChart(idx, data, select_callback) {
@@ -314,24 +335,8 @@ function parallelCoordinatesChart(idx, data, select_callback) {
     d3.selectAll(".axis.food_group .tick text")
         .style("fill", color);
 
-    var output = d3.select("#tableDiv").append("table").attr("class", "table table-striped");
 
-    function drawTable(dataToDisplay) {
-        output.text("");
-        var thead = output.append("thead");
-        var tr = thead.append("tr");
-        dimensions.forEach(function (dim, i) {
-            tr.append("th").text(dim.description);
-        });
-        var tbody = output.append("tbody");
-        dataToDisplay.forEach(function (d) {
-            tr = tbody.append("tr");
-            dimensions.forEach(function (dim) {
-                tr.append("td").text(d[dim.key]);
-            });
 
-        });
-    }
 
     drawTable(data);
 
