@@ -260,11 +260,13 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 
     // If the brush is empty, select all circles.
     function brushEnd() {
-        if (d3.event.selection === null)
+        if (d3.event.selection === null) {
             svg.selectAll(".hidden").classed("hidden", false);
+            updateCallback(data, "SPM");
+        }
     }
 
-}
+};
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF';

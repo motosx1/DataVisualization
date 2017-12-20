@@ -136,3 +136,8 @@ li {
     margin: auto;
     display: block;
 }
+
+svg#vis {
+    display: block;
+    margin: auto;
+}
