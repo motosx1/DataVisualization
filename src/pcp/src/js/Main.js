@@ -2,8 +2,8 @@ function Main() {
     self = this;
 
     // Data
-    self._data = [];
-    self._data_selected = [];
+    self._data = []
+    self._data_selected = []
 
 
     // Charts
@@ -13,7 +13,6 @@ function Main() {
     self._legend = null;
     self._dataTable = null;
     self._stats = null;
-    self._scatterPlot = null;
 
     self.c = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'red'];
 
@@ -26,6 +25,7 @@ Main.prototype = {
         console.debug("Main: init");
         d3.csv("./data/car_data.csv", function (d) {
             return {
+                'id': d['id'],
                 'make': d['make'],
                 'fuel-type': d['fuel_type'],
                 'length': +d['length'],
@@ -55,12 +55,6 @@ Main.prototype = {
         var reduced_tsne = reduceDimTSNE(initial_array);
         var clusters = clusterKMeans(initial_array);
         var tsne_clusters = toObjects(reduced_tsne, clusters);
-        var c = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'red'];
-
-        var color = function (i) {
-            // var c = ['#66c2a5', '#fc8d62', '#8ad0cb'];
-            return c[i%3];
-        }
 
         self._data.forEach(function (p, i) {
             p['category'] = self.color(tsne_clusters[i]['category']);
@@ -72,8 +66,14 @@ Main.prototype = {
         drawScatterplot(self._data);
 
         self._pcp = parallelCoordinatesChart2("pcp", self._data, self.callback_updateCharts);
-        self._scatterPlot = drawScatterplotMatrix(self._data, getFeatureNames(self._data));
-        addButtons(getFeatureNames(self._data));
+
+        // Filter out the data which should not be plotted
+        var newData = JSON.parse(JSON.stringify(self._data));
+        newData.forEach(function(d) {delete d['tsne-x']; delete d['tsne-y'];});
+        // console.log("The new Data:" + newData);
+
+        self._scatterPlot = drawScatterplotMatrix(newData, getFeatureNames(newData));
+        addButtons(getFeatureNames(newData));
     },
 
     color: function (i) {
@@ -82,25 +82,10 @@ Main.prototype = {
 
     callback_updateCharts: function (selected_data) {
         updateScatterplot(selected_data, self.color, self.c);
+        selectDataByIndex(selected_data);
     }
 
 
-
-    callback_applyGroupFilter: function (groupFilter) {
-        var hide = false;
-        var index = self._data_visible_groups.indexOf(groupFilter);
-        if (index == -1) {   // Index does not exist
-            hide = false;
-            // Add group as a visible group
-            self._data_visible_groups.push(groupFilter);
-        } else { // Index does exist
-            hide = true;
-            // Remove group as visible
-            self._data_visible_groups.splice(index, 1);
-        }
-        self.refreshCharts();
-        return hide;
-    },
 }
 
 function capitalize(string) {

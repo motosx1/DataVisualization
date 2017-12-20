@@ -59,7 +59,7 @@ div.tooltip {
     position: absolute;
     text-align: center;
     width: 100px;
-    height: 40px;
+    height: 45px;
     padding: 2px;
     font: 12px sans-serif;
     background: lightsteelblue;
@@ -85,7 +85,8 @@ div.tooltip {
 text.label {
     stroke: black;
     fill: black;
-    font-weight: 800;
+    font-family: sans-serif;
+    font-size: 10px;
 }
 
 div#vis,
@@ -129,4 +130,9 @@ li {
 
 .selected {
     background-color: #007bff66;
+}
+
+#plotSVG {
+    margin: auto;
+    display: block;
 }

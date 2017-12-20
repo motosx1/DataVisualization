@@ -19,19 +19,19 @@ var scatterPlotSize = 230;
 var scaleLeft = d3.scaleLinear()
     .range([scatterPlotSize - padding / 2, padding / 2]);
 
-var leftAxis = d3.axisLeft(scaleLeft)
-    .ticks(6);
+var leftAxis = d3.axisLeft(scaleLeft);
 
 /* Create a template for the bottom axis */
 var scaleBottom = d3.scaleLinear()
     .range([padding / 2, scatterPlotSize - padding / 2]);
 
-var bottomAxis = d3.axisBottom(scaleBottom)
-    .ticks(3);
+var bottomAxis = d3.axisBottom(scaleBottom);
 
 var totalFeatures;
 
 var mainData;
+
+var baseLeftOffset = 40;
 
 function getDomainAndFeatureNr(data, excludedFeatures) {
 
@@ -141,12 +141,15 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
     leftAxis.tickSize(-distanceToBottom);
     bottomAxis.tickSize(-distanceToBottom);
 
+
+    console.log("The current distanceToBottom is " + distanceToBottom);
+
     /* Start adding elements */
     var svg = d3
 		.select("#vis-scatter-matrix")
         .append("svg")
 		.attr("id", "plotSVG")
-        .attr("width", distanceToBottom + padding)
+        .attr("width", distanceToBottom + padding * 3)
         .attr("height", distanceToBottom + padding)
         .attr("transform", "translate(" + padding + ", " + padding / 2 + ")");
 
@@ -156,11 +159,11 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
 				.enter()
 					.append("g")
 					.attr("class", "x_axis")
-					.attr("transform", function(d, i) { return "translate(" + ((i * scatterPlotSize) + 15) + ", " + (distanceToBottom - padding / 2) + ")" })
-					.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis); })
+					.attr("transform", function(d, i) { return "translate(" + ((i * scatterPlotSize) + baseLeftOffset) + ", " + (distanceToBottom - padding / 2) + ")" })
+					.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis.ticks(3).tickFormat(d3.formatPrefix(".0", 1e2))); })
 				.append("text")
 					.attr("class", "label")
-					.attr("x", padding / 2 + 10)
+					.attr("x", padding + baseLeftOffset)
 					.attr("y", 20)
 					.style("text-anchor", "end")
 					.text(function(d) { return d.toUpperCase(); } );
@@ -170,12 +173,13 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
         .enter()
         .append("g")
 			.attr("class", "y_axis")
-			.attr("transform", function(d, i) { return "translate(" + 25 + ", " + ((featureNumber - 1 - i) * scatterPlotSize) + ")" })
-			.each(function(d) { scaleLeft.domain(domains[d]); d3.select(this).call(leftAxis); })
+			.attr("transform", function(d, i) { return "translate(" + (baseLeftOffset + 10) + ", " + ((featureNumber - 1 - i) * scatterPlotSize) + ")" })
+			.each(function(d) { scaleLeft.domain(domains[d]); d3.select(this).call(leftAxis.ticks(3).tickFormat(d3.formatPrefix(".0", 1e2))); })
         .append("text")
 			.attr("class", "label")
 			.attr("x", -15)
-			.attr("y", scatterPlotSize - padding / 2 - 10)
+			.attr("y", -baseLeftOffset)
+			.attr("transform", "rotate(-90)")
 			.style("text-anchor", "end")
 			.text(function(d) { return d.toUpperCase(); } );
 
@@ -194,16 +198,16 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
 				.append("g")
 				.attr("class", "cell")
 				/* The constants 16 and 0.5 are used here for corrective purposes, i.e. to properly align the rectangle to the axes */
-				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + 16) + ", " + ((featureNumber - d.j - 1) * scatterPlotSize + 0.5) + ")"; })
+				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + baseLeftOffset) + ", " + ((featureNumber - d.j - 1) * scatterPlotSize + 0.5) + ")"; })
 				.each(curryPlot);
 
 	/* Add a label to the cells found on the secondary diagonal of the scatter plot matrix */
-	cells.filter(function(d) { return d.i === d.j; })
-		.append("text")
-		.attr("x", padding)
-		.attr("y", padding)
-		.attr("dy", ".71em")
-		.text(function(d) { return d.iName; });
+	// cells.filter(function(d) { return d.i === d.j; })
+	// 	.append("text")
+	// 	.attr("x", padding)
+	// 	.attr("y", padding)
+	// 	.attr("dy", ".71em")
+	// 	.text(function(d) { return d.iName; });
 
 	cells
 		.filter(function (t) { return t.i !== t.j; })
@@ -246,6 +250,7 @@ window.drawScatterplotMatrix = function(data, selectedFeatures = [], excludedFea
     }
 
 }
+
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
@@ -299,7 +304,7 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 			.attr("class", "circle")
 			.attr("cx", function (d) { return scaleBottom(d[p.iName]); })
 			.attr("cy", function (d) { return scaleLeft(d[p.jName]); })
-			.attr("r", 3)
+			.attr("r", 2)
 			.style("fill", function(d) { return d['category']; });
     else {
     	cell.style("fill", "white");
@@ -457,7 +462,7 @@ window.getFeatureNames = function(data) {
 	console.log("Names: " + finalKeys);
 
 	return finalKeys;
-}
+};
 
 window.addButtons = function(featureNames) {
 
@@ -469,4 +474,23 @@ window.addButtons = function(featureNames) {
 		$("#featuresDiv").append(newElement);
     }
 
-}
+};
+
+window.selectDataByIndex = function(selectedData) {
+
+	var set = new Set();
+
+	selectedData.forEach(function (d) {
+		set.add(d['id']);
+    });
+
+    d3
+        .select("#vis-scatter-matrix")
+		.selectAll(".circle").classed("hidden", function (d) {
+		// Waaay too slow
+    	// var res = selectedData.reduce(function(acc, e) {return acc || (e['id'] === d['id'])}, false);
+    	// console.log(res);
+
+        return !set.has(d['id']);
+    });
+};
