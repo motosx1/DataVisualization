@@ -16,8 +16,7 @@ function Main() {
 
     self.c_normal = ['#e41a1c', '#377eb8', '#4daf4a'];
     self.c_blind = ['#1b9e77', '#d95f02', '#7570b3'];
-
-    self.colorBlindFlag = false;
+    self.c_map = null;
 
     self.init();
 }
@@ -54,8 +53,16 @@ Main.prototype = {
 
     setupCharts: function () {
 
+        self.c_map = smartZip(self.c_normal, self.c_blind);
+
         $("#colorblindbutton").click(function () {
-            self.colorBlindFlag = !self.colorBlindFlag;
+            if ($("#colorblindbutton").hasClass("selected"))
+
+                $("#colorblindbutton").removeClass("selected");
+            else
+                $("#colorblindbutton").addClass("selected");
+
+            self.changeColor();
         });
 
         var initial_array = toNestedArray(self._data);
@@ -83,6 +90,16 @@ Main.prototype = {
         return colorScheme[i % 3];
     },
 
+    changeColor: function () {
+        self._data.forEach(function (d) {
+            d['category'] = self.c_map.get(d['category']);
+        });
+
+        $("")
+
+        changeToNewSchemeScatterPlot();
+    },
+
 
     callback_updateCharts: function (selected_data, source_name) {
         var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
@@ -107,4 +124,22 @@ Main.prototype = {
     }
 
 
+}
+
+function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function smartZip(arrayA, arrayB) {
+    var finalData = new Map();
+
+
+    arrayA.forEach(function (d, i) {
+        finalData.set(d, arrayB[i]);
+        finalData.set(arrayB[i], d);
+    });
+
+    console.log(finalData);
+
+    return finalData;
 }

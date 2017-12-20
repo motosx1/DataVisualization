@@ -105,5 +105,4 @@ function drawScatterplot(data) {
             return d['category'];
         });
 
-
 }

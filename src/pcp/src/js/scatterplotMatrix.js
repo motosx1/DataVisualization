@@ -244,14 +244,13 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
         } else {
         	var returnedData = new Set();
 
-
             svg.selectAll(".circle").classed("hidden", function (d) {
             	var res = e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0] ||
 				          e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
                 if (!res)
                 	returnedData.add(d);
 
-            	return res;
+                return res;
             });
 
             updateCallback(Array.from(returnedData), "SPM");
@@ -267,7 +266,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
         }
     }
 
-};
+}
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
@@ -361,7 +360,7 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 
         bars.append("rect")
 			.attr("x", 1)
-			.style("fill", "blue")
+			.style("fill", "#66c2a5")
             .attr("width", function (d) { return scaleBottom(d.x1) - scaleBottom(d.x0) - 1})
             .attr("height", function(d) { /*//console.log("The scale of " + d.length + " " + scaleLeft(d.length));*/  return scaleLeft(d.length) - 10; });
     }
@@ -480,3 +479,11 @@ window.selectDataByIndex = function(selectedData) {
         return !set.has(d['id']);
     });
 };
+
+window.changeToNewSchemeScatterPlot = function() {
+    d3
+        .select("#vis-scatter-matrix")
+        .selectAll(".circle")
+        .style("fill", function(d) { return d['category'] });
+
+}
