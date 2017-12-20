@@ -484,6 +484,8 @@ window.changeToNewSchemeScatterPlot = function() {
     d3
         .select("#vis-scatter-matrix")
         .selectAll(".circle")
+        .transition()
+        .duration(1000)
         .style("fill", function(d) { return d['category'] });
 
 }

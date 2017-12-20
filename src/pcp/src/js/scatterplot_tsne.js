@@ -1,10 +1,15 @@
 function updateScatterplot(data, color_function, color_domain) {
-    d3.select('#vis').selectAll('.dot').remove();
+    d3
+        .select('#vis')
+        .selectAll('.dot')
+        .remove();
     d3.selectAll(".rect").style("fill", function (d, i) {
         return color_function(i);
     });
     drawScatterplot(data, color_function, color_domain);
 }
+
+
 
 var xScale;
 var yScale;
@@ -13,8 +18,8 @@ var svg;
 function initTsneScatter(data, color_function, color_domain) {
 
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+        width = 1060 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
 
 
     svg = d3.select("#vis")
@@ -23,16 +28,20 @@ function initTsneScatter(data, color_function, color_domain) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    var xExtent = d3.extent(data, function (d) {
+        return d['tsne-x'];
+    });
+
+    var yExtent = d3.extent(data, function (d) {
+        return d['tsne-y'];
+    });
+
     xScale = d3.scaleLinear()
-        .domain(d3.extent(data, function (d) {
-            return d['tsne-x'];
-        })).nice()
+        .domain(xExtent).nice()
         .range([0, width]);
 
     yScale = d3.scaleLinear()
-        .domain(d3.extent(data, function (d) {
-            return d['tsne-y'];
-        })).nice()
+        .domain(yExtent).nice()
         .range([height, 0]);
 
     var xAxis = d3.axisBottom()
@@ -41,9 +50,17 @@ function initTsneScatter(data, color_function, color_domain) {
     var yAxis = d3.axisLeft()
         .scale(yScale);
 
+    var idle;
+    var idleTime = 350;
+    var brush = d3
+        .brush()
+        .on("end", brushEnd);
+
+    svg.append("g").attr("class", "brush").call(brush);
+
 
     svg.append("g")
-        .attr("class", "x axis")
+        .attr("class", "x-axis-tsne")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
         .append("text")
@@ -54,7 +71,7 @@ function initTsneScatter(data, color_function, color_domain) {
         .text("Reduction_1");
 
     svg.append("g")
-        .attr("class", "y axis")
+        .attr("class", "y-axis-tsne")
         .call(yAxis)
         .append("text")
         .attr("class", "label")
@@ -90,6 +107,47 @@ function initTsneScatter(data, color_function, color_domain) {
             return "Category " + (i + 1);
         });
 
+
+    function brushEnd() {
+        /* If the selection is null, and we have a double click, reset the scale, and implicitly the graph */
+        if (!d3.event.selection) {
+            if (!idle)
+                return idle = setTimeout(idled, idleTime);
+
+            xScale.domain(xExtent);
+            yScale.domain(yExtent);
+        } else {
+            /* Otherwise, adjust the scale such that it will not focus on the area encompassed by the brush drag */
+            xScale.domain([d3.event.selection[0][0], d3.event.selection[1][0]].map(xScale.invert, xScale));
+            yScale.domain([d3.event.selection[1][1], d3.event.selection[0][1]].map(yScale.invert, yScale));
+            svg.select(".brush").call(brush.move, null);
+        }
+        /* Perform the zoom-in operation (or zoom-out in case of double click) */
+        zoom();
+    }
+
+    function zoom() {
+        var duration = 400;
+
+        /* Adapt the axes to the new scales*/
+        svg.select(".x-axis-tsne").transition().duration(duration).call(xAxis);
+        svg.select(".y-axis-tsne").transition().duration(duration).call(yAxis);
+
+        /* Adapt the circles to the new scales */
+        svg
+            .selectAll('.dot')
+            .transition().duration(duration)
+            .attr("cx", function (d) {
+                return xScale(d['tsne-x']);
+            })
+            .attr("cy", function (d) {
+                return yScale(d['tsne-y']);
+            });
+    }
+
+    function idled() {
+        idle = null;
+    }
 
 }
 
