@@ -48,7 +48,7 @@ function initTsneScatter(data, color_function, color_domain) {
         .attr("x", width)
         .attr("y", -6)
         .style("text-anchor", "end")
-        .text("Sepal Width (cm)");
+        .text("Reduction_1");
 
     svg.append("g")
         .attr("class", "y axis")
@@ -59,7 +59,7 @@ function initTsneScatter(data, color_function, color_domain) {
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Sepal Length (cm)");
+        .text("Reduction_2");
 
     var legend = svg.selectAll(".legend")
         .data(color_domain)
