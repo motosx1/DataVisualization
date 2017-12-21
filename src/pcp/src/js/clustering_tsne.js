@@ -14,6 +14,42 @@ function toNestedArray(data) {
     return ret;
 }
 
+function normalize(unnormalized_data) {
+    min_max = [ {min:unnormalized_data[0][0], max:unnormalized_data[0][0]}
+                   , {min:unnormalized_data[0][1], max:unnormalized_data[0][1]}
+                   , {min:unnormalized_data[0][2], max:unnormalized_data[0][2]}
+                   , {min:unnormalized_data[0][3], max:unnormalized_data[0][3]}
+                   , {min:unnormalized_data[0][4], max:unnormalized_data[0][4]}
+                   , {min:unnormalized_data[0][5], max:unnormalized_data[0][5]}
+                   , {min:unnormalized_data[0][6], max:unnormalized_data[0][6]}
+                   , {min:unnormalized_data[0][7], max:unnormalized_data[0][7]}
+                   , {min:unnormalized_data[0][8], max:unnormalized_data[0][8]}
+                 ];
+
+    // Find minima and maxima
+    for (i = 0; i < unnormalized_data.length; i++) {
+        for (j = 0; j < unnormalized_data[i].length; j++) {
+            if (min_max[j].max < unnormalized_data[i][j]) {
+                min_max[j].max = unnormalized_data[i][j];
+            }
+            if (unnormalized_data[i][j] < min_max[j].min) {
+                min_max[j].min = unnormalized_data[i][j];
+            }
+        }
+    }
+
+    // normalize the data
+    normalized_data = [];
+
+    for (i = 0; i < unnormalized_data.length; i++) {
+        normalized_data.push([]);
+        for (j = 0; j < unnormalized_data[i].length; j++) {
+            normalized_data[i].push((unnormalized_data[i][j] - min_max[j].min) / min_max[j].max);
+        }
+    }
+    return normalized_data;
+}
+
 /* Clusters the data in the given amount of clusters.
 
    @param data: [[Double]], containing the data
@@ -22,7 +58,7 @@ function toNestedArray(data) {
    */
 function clusterKMeans(data, numclusters) {
     var kmeans = new KMEANS();
-    var clusters = kmeans.run(data, numclusters);
+    var clusters = kmeans.run(normalize(data), numclusters);
 
     out = [];
     for (var i = 0; i < clusters.length; i++) {
@@ -48,7 +84,7 @@ function reduceDimTSNE(data) {
     var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
 
     // initialize data.
-    tsne.initDataRaw(data);
+    tsne.initDataRaw(normalize(data));
 
     for(var k = 0; k < 800; k++) {
         tsne.step(); // every time you call this, solution gets better
