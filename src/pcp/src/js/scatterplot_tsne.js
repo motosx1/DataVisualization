@@ -61,6 +61,9 @@ function drawScatterplot(data, color_function, color_domain) {
         .on('mouseover', function (d) {
             var transitionTime = 100;
 
+            svg.selectAll("text").filter(".tip")
+                .remove();
+
             svg.append('text')
                 .transition()
                 .attr("class", "tip")
@@ -107,5 +110,5 @@ function drawScatterplot(data, color_function, color_domain) {
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function(d, i) { return "Category "+(i+1); });
+        .text(function(d, i) { return "Cluster "+(i+1); });
 }
