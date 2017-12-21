@@ -7,7 +7,7 @@ var width = viewWidth - margin.left - margin.right - 50;
 var height = viewHeight - margin.top - margin.bottom - 50;
 
 // get the data
-var boats = boat_data.boats
+var boats;
 
 /* Define a paading of 20px */
 var padding = 20;
@@ -19,17 +19,21 @@ var scatterPlotSize = 230;
 var scaleLeft = d3.scaleLinear()
     .range([scatterPlotSize - padding / 2, padding / 2]);
 
-var leftAxis = d3.axisLeft(scaleLeft)
-    .ticks(6);
+var leftAxis = d3.axisLeft(scaleLeft);
 
 /* Create a template for the bottom axis */
 var scaleBottom = d3.scaleLinear()
     .range([padding / 2, scatterPlotSize - padding / 2]);
 
-var bottomAxis = d3.axisBottom(scaleBottom)
-    .ticks(6);
+var bottomAxis = d3.axisBottom(scaleBottom);
+
+var totalFeatures;
 
 var mainData;
+
+var baseLeftOffset = 40;
+
+var updateCallback;
 
 function getDomainAndFeatureNr(data, excludedFeatures) {
 
@@ -49,6 +53,27 @@ function getDomainAndFeatureNr(data, excludedFeatures) {
 	return [domain, featureNames, featureNumber];
 }
 
+function rescaleCoords(total) {
+    var chart = d3.select('#headingFour');
+    var targetWidth = chart.node().getBoundingClientRect().width;
+
+    scatterPlotSize = targetWidth / total - padding;
+
+    /* Create a template for the left axis */
+    scaleLeft = d3.scaleLinear()
+        .range([scatterPlotSize - padding / 2, padding / 2]);
+
+    leftAxis = d3.axisLeft(scaleLeft)
+        .ticks(6);
+
+    /* Create a template for the bottom axis */
+    scaleBottom = d3.scaleLinear()
+        .range([padding / 2, scatterPlotSize - padding / 2]);
+
+    bottomAxis = d3.axisBottom(scaleBottom)
+        .ticks(3);
+}
+
 function createBins(data, featureNames, binNumber) {
 
 	var bins = [];
@@ -57,13 +82,13 @@ function createBins(data, featureNames, binNumber) {
 
 		var currentExtent = d3.extent(data, function(d) { return d[featureNames[i]]; });
 		//currentExtent = [Math.ceil(currentExtent[0] / 100) * 100, Math.ceil(currentExtent[1] / 100) * 100];
-        console.log("Asd1: " + currentExtent);
+        ////console.log("Asd1: " + currentExtent);
 
         // Generate the thresholds
         currentExtent = d3.range(currentExtent[0], currentExtent[1],  Math.abs(currentExtent[1] - currentExtent[0]) / binNumber);
 
-        console.log("Asd2: " + currentExtent);
-		console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
+        ////console.log("Asd2: " + currentExtent);
+		////console.log(d3.ticks(currentExtent[0], currentExtent[1], 10));
 
 		bins.push(
 			d3
@@ -74,18 +99,27 @@ function createBins(data, featureNames, binNumber) {
 
 	}
 
-	console.log("The bins");
-	console.log(bins);
+	////console.log("The bins");
+	////console.log(bins);
 
 
 	return bins;
 }
 
-function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
+window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures = [], excludedFeatures = []) {
 	/* remove what was previously in this SVG */
 	d3.select("#plotSVG").remove();
 
-	mainData = data;
+    mainData = data;
+
+    rescaleCoords(selectedFeatures.length);
+    //addButtons(selectedFeatures);
+    totalFeatures = selectedFeatures;
+
+    updateCallback = callback;
+
+	////console.log("HERE");
+	////console.log(data);
 
 	/* Get some info on the data */
 	var res = getDomainAndFeatureNr(data, excludedFeatures);
@@ -104,19 +138,22 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
         .on("brush", brushMove)
         .on("end", brushEnd);
 
-    console.log(res);
+    ////console.log(res);
 
     var distanceToBottom = scatterPlotSize * featureNumber;
 
     leftAxis.tickSize(-distanceToBottom);
     bottomAxis.tickSize(-distanceToBottom);
 
+
+    //console.log("The current distanceToBottom is " + distanceToBottom);
+
     /* Start adding elements */
     var svg = d3
-		.select("#vis")
+		.select("#vis-scatter-matrix")
         .append("svg")
 		.attr("id", "plotSVG")
-        .attr("width", distanceToBottom + padding)
+        .attr("width", distanceToBottom + padding * 3)
         .attr("height", distanceToBottom + padding)
         .attr("transform", "translate(" + padding + ", " + padding / 2 + ")");
 
@@ -126,11 +163,11 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 				.enter()
 					.append("g")
 					.attr("class", "x_axis")
-					.attr("transform", function(d, i) { return "translate(" + ((i * scatterPlotSize) + 15) + ", " + (distanceToBottom - padding / 2) + ")" })
-					.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis); })
+					.attr("transform", function(d, i) { return "translate(" + ((i * scatterPlotSize) + baseLeftOffset) + ", " + (distanceToBottom - padding / 2) + ")" })
+					.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis.ticks(3).tickFormat(d3.formatPrefix(".0", 1e2))); })
 				.append("text")
 					.attr("class", "label")
-					.attr("x", padding / 2 + 10)
+					.attr("x", padding + baseLeftOffset)
 					.attr("y", 20)
 					.style("text-anchor", "end")
 					.text(function(d) { return d.toUpperCase(); } );
@@ -140,12 +177,13 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
         .enter()
         .append("g")
 			.attr("class", "y_axis")
-			.attr("transform", function(d, i) { return "translate(" + 25 + ", " + ((featureNumber - 1 - i) * scatterPlotSize) + ")" })
-			.each(function(d) { scaleLeft.domain(domains[d]); d3.select(this).call(leftAxis); })
+			.attr("transform", function(d, i) { return "translate(" + (baseLeftOffset + 10) + ", " + ((featureNumber - 1 - i) * scatterPlotSize) + ")" })
+			.each(function(d) { scaleLeft.domain(domains[d]); d3.select(this).call(leftAxis.ticks(3).tickFormat(d3.formatPrefix(".0", 1e2))); })
         .append("text")
 			.attr("class", "label")
 			.attr("x", -15)
-			.attr("y", scatterPlotSize - padding / 2 - 10)
+			.attr("y", -baseLeftOffset)
+			.attr("transform", "rotate(-90)")
 			.style("text-anchor", "end")
 			.text(function(d) { return d.toUpperCase(); } );
 
@@ -164,16 +202,16 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
 				.append("g")
 				.attr("class", "cell")
 				/* The constants 16 and 0.5 are used here for corrective purposes, i.e. to properly align the rectangle to the axes */
-				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + 16) + ", " + ((featureNumber - d.j - 1) * scatterPlotSize + 0.5) + ")"; })
+				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + baseLeftOffset) + ", " + ((featureNumber - d.j - 1) * scatterPlotSize + 0.5) + ")"; })
 				.each(curryPlot);
 
 	/* Add a label to the cells found on the secondary diagonal of the scatter plot matrix */
-	cells.filter(function(d) { return d.i === d.j; })
-		.append("text")
-		.attr("x", padding)
-		.attr("y", padding)
-		.attr("dy", ".71em")
-		.text(function(d) { return d.iName; });
+	// cells.filter(function(d) { return d.i === d.j; })
+	// 	.append("text")
+	// 	.attr("x", padding)
+	// 	.attr("y", padding)
+	// 	.attr("dy", ".71em")
+	// 	.text(function(d) { return d.iName; });
 
 	cells
 		.filter(function (t) { return t.i !== t.j; })
@@ -196,26 +234,40 @@ function drawScatterplot(data, selectedFeatures = [], excludedFeatures = []) {
     function brushMove(p) {
         var e = d3.brushSelection(this);
 
-        console.log("" + e);
-        console.log(p.iName + " " + p.jName);
+        ////console.log("" + e);
+        ////console.log(p.iName + " " + p.jName);
 
-        if (!e)
+        if (!e) {
             svg.selectAll(".circle").classed("hidden", false);
-        else
-			svg.selectAll(".circle").classed("hidden", function (d) {
-				return e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0]
-					|| e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
-			});
+
+            updateCallback([], "SPM");
+        } else {
+        	var returnedData = new Set();
+
+            svg.selectAll(".circle").classed("hidden", function (d) {
+            	var res = e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0] ||
+				          e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
+                if (!res)
+                	returnedData.add(d);
+
+                return res;
+            });
+
+            updateCallback(Array.from(returnedData), "SPM");
+        }
 
     }
 
     // If the brush is empty, select all circles.
     function brushEnd() {
-        if (d3.event.selection === null)
+        if (d3.event.selection === null) {
             svg.selectAll(".hidden").classed("hidden", false);
+            updateCallback(data, "SPM");
+        }
     }
 
 }
+
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
@@ -248,7 +300,7 @@ function cartesianProduct(featureSetA, featureSetB) {
 function plotCellAndPoints(caller, domains, data, p, bins) {
     var cell = d3.select(caller);
 
-    console.log(cell);
+    ////console.log(cell);
 
     cell.append("rect")
         .attr("class", "frame")
@@ -269,8 +321,8 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 			.attr("class", "circle")
 			.attr("cx", function (d) { return scaleBottom(d[p.iName]); })
 			.attr("cy", function (d) { return scaleLeft(d[p.jName]); })
-			.attr("r", 3)
-			.style("fill", getRandomColor());
+			.attr("r", 2)
+			.style("fill", function(d) { return d['category']; });
     else {
     	cell.style("fill", "white");
 
@@ -308,21 +360,11 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 
         bars.append("rect")
 			.attr("x", 1)
-			.style("fill", "blue")
+			.style("fill", "#66c2a5")
             .attr("width", function (d) { return scaleBottom(d.x1) - scaleBottom(d.x0) - 1})
-            .attr("height", function(d) { console.log("The scale of " + d.length + " " + scaleLeft(d.length));  return scaleLeft(d.length) - 10; });
+            .attr("height", function(d) { /*//console.log("The scale of " + d.length + " " + scaleLeft(d.length));*/  return scaleLeft(d.length) - 10; });
     }
 
-}
-
-function resize() {
-  viewWidth = window.innerWidth;
-  viewHeight = window.innerHeight;
-
-  width = viewWidth - margin.left - margin.right - 50;
-  height = viewHeight - margin.top - margin.bottom - 50;
-
-  drawScatterplot(boats);
 }
 
 function getCommonSet(setA, setB) {
@@ -345,38 +387,105 @@ function getCommonSet(setA, setB) {
 	return finalSet;
 }
 
-var totalFeatures = d3.keys(boats[0]); // ["a", "m", "u", "v", "x", "y"];
-
-$(function() {
-
-	for (var i = 0; i < totalFeatures.length; ++i) {
-		var newElement = "<li onclick='elementSelected(this)' value='" + totalFeatures[i] + "' class = 'featureFont'>" + totalFeatures[i] + "</li>";
-
-		$("#features").append(newElement);
-	}
-
-    console.log(totalFeatures);
-
-    drawScatterplot(boats, totalFeatures);
-});
-
-function elementSelected(element) {
+window.elementSelected = function(element) {
 	var value = element.getAttribute("value");
     var index = totalFeatures.indexOf(value);
 
-	console.log(value);
+	////console.log(value);
 
 	if (index >= 0) {
         totalFeatures.splice(index, 1);
     	// element.setAttribute("style", "color: black;");
-		$(element).addClass("unselectedFont");
+		$(element).addClass("selected");
 	} else {
         totalFeatures.push(value);
     	// element.removeAttribute("style");
-        $(element).removeClass("unselectedFont");
+        $(element).removeClass("selected");
 	}
 
-	console.log(totalFeatures);
+	////console.log(totalFeatures);
 
-    drawScatterplot(data, totalFeatures);
+    drawScatterplotMatrix(mainData, updateCallback, totalFeatures);
+}
+
+
+window.getFeatureNames = function(data) {
+	var myKeys = d3.keys(data[0]);
+	var finalKeys = [];
+
+	for (var i = 0; i < myKeys.length; ++i) {
+
+		var type = typeof data[0][myKeys[i]];
+
+		//console.log("Type:" + type);
+
+		if (type !== "string")
+            finalKeys.push(myKeys[i]);
+
+	}
+
+	//console.log("Names: " + finalKeys);
+
+	return finalKeys;
+};
+
+window.getFeatureNames = function(data, excluded) {
+    var myKeys = d3.keys(data[0]);
+    var finalKeys = [];
+
+    for (var i = 0; i < myKeys.length; ++i) {
+
+        var type = typeof data[0][myKeys[i]];
+
+        //console.log("Type:" + type);
+
+        if (type !== "string" && !excluded.includes(myKeys[i]))
+            finalKeys.push(myKeys[i]);
+
+    }
+
+    //console.log("Names: " + finalKeys);
+
+    return finalKeys;
+};
+
+window.addButtons = function(featureNames) {
+
+	$("#featuresDiv").empty()
+
+    for (var i = 0; i < featureNames.length; ++i) {
+		var newElement = "<button onclick='elementSelected(this)' value='" + featureNames[i] + "' class = 'button'>" + featureNames[i] + "</button>";
+
+		$("#featuresDiv").append(newElement);
+    }
+
+};
+
+window.selectDataByIndex = function(selectedData) {
+
+	var set = new Set();
+
+	selectedData.forEach(function (d) {
+		set.add(d['id']);
+    });
+
+    d3
+        .select("#vis-scatter-matrix")
+		.selectAll(".circle").classed("hidden", function (d) {
+		// Waaay too slow
+    	// var res = selectedData.reduce(function(acc, e) {return acc || (e['id'] === d['id'])}, false);
+    	// //console.log(res);
+
+        return !set.has(d['id']);
+    });
+};
+
+window.changeToNewSchemeScatterPlot = function() {
+    d3
+        .select("#vis-scatter-matrix")
+        .selectAll(".circle")
+        .transition()
+        .duration(1000)
+        .style("fill", function(d) { return d['category'] });
+
 }

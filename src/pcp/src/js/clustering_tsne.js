@@ -42,7 +42,7 @@ function clusterKMeans(data, numclusters) {
 function reduceDimTSNE(data) {
     var opt = {};
     opt.epsilon = 10; // epsilon is learning rate (10 = default)
-    opt.perplexity = 20; // roughly how many neighbors each point influences (30 = default)
+    opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
     opt.dim = 2; // dimensionality of the embedding (2 = default)
 
     var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
@@ -50,7 +50,7 @@ function reduceDimTSNE(data) {
     // initialize data.
     tsne.initDataRaw(data);
 
-    for(var k = 0; k < 500; k++) {
+    for(var k = 0; k < 800; k++) {
         tsne.step(); // every time you call this, solution gets better
     }
 
@@ -64,13 +64,12 @@ function reduceDimTSNE(data) {
    @param clusters: [Int], containing a list of cluster assignments
    @return [{x:,y:,category:}], list of objects containing the coordinates and category of a point
    */
-function toObjects(tsne_array, clusters, data) {
+function toObjects(tsne_array, clusters) {
     var objects = [];
     var ob = {};
     for (i = 0; i < tsne_array.length; i++) {
         ob = {x:tsne_array[i][0], y:tsne_array[i][1], category:clusters[i]};
-        ob2 = Object.assign(ob, data[i]);
-        objects.push(ob2);
+        objects.push(ob);
     }
     return objects;
 }
@@ -82,4 +81,5 @@ function toObjects(tsne_array, clusters, data) {
 //var clusters = clusterKMeans(data_boats);
 //var tsne_clusters = toObjects(reduced_tsne, clusters);
 
+// plot the data
 //drawScatterplot(tsne_clusters);

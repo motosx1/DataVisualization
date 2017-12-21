@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<link rel=stylesheet href=scatterplot.css>
+		<script type="text/javascript" src="d3.v4.min.js" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="vis">
+			<svg></svg>
+		</div>
+
+		<div id = "wrapper">
+			<div class = "inner-div" onchange = "changedSelect()">
+				<select class = "select-item">
+					<option value = "x" selected>x</option>
+					<option value = "y">y</option>
+					<option value = "u">u</option>
+					<option value = "v">v</option>
+					<option value = "m">m</option>
+					<option value = "a">a</option>
+				</select>
+			</div>
+			<div class = "inner-div" onchange = "changedSelect()">
+				<select class = "select-item">
+					<option value = "x">x</option>
+					<option value = "y" selected>y</option>
+					<option value = "u">u</option>
+					<option value = "v">v</option>
+					<option value = "m">m</option>
+					<option value = "a">a</option>
+				</select>
+			</div>
+			<div class = "inner-div" onchange = "changedSelect()">
+				<select class = "select-item">
+					<option value = "x">x</option>
+					<option value = "y">y</option>
+					<option value = "u">u</option>
+					<option value = "v">v</option>
+					<option value = "m">m</option>
+					<option value = "a" selected>a</option>
+				</select>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="data.js"></script>
+		<script type="text/javascript" src="scatterplot.js"></script>
+	</body>
+</html>

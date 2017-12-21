@@ -2,8 +2,8 @@ function Main() {
     self = this;
 
     // Data
-    self._data = [];
-    self._data_selected = [];
+    self._data = []
+    self._data_selected = []
 
 
     // Charts
@@ -14,33 +14,10 @@ function Main() {
     self._dataTable = null;
     self._stats = null;
 
-    // Other
-    self._colors = {
-        "selected": "#97a4bc",
-        "un-selected": "#e8eefd",
-        "alfa-romero": '#0a72ff',
-        "audi": '#1eff06',
-        "bmw": '#ff1902',
-        "chevrolet": '#2dfefe',
-        "dodge": '#827c01',
-        "honda": '#fe07a6',
-        "isuzu": '#a8879f',
-        "jaguar": '#fcff04',
-        "mazda": '#c602fe',
-        "mercedes-benz": '#16be61',
-        "mercury": '#ff9569',
-        "mitsubishi": '#05b3ff',
-        "nissan": '#8ffec2',
-        "peugot": '#3f8670',
-        "plymouth": '#e992ff',
-        "porsche": '#ffb209',
-        "renault": '#e72955',
-        "saab": '#83bf02',
-        "subaru": '#bba67b',
-        "toyota": '#fe7eb1',
-        "volkswagen": '#7570c1',
-        "volvo": "#85bfd1"
-    };
+    self.c_normal = ['#e41a1c', '#377eb8', '#4daf4a'];
+    self.c_blind = ['#1b9e77', '#d95f02', '#7570b3'];
+    self.c_map = null;
+
     self.init();
 }
 
@@ -49,6 +26,7 @@ Main.prototype = {
         console.debug("Main: init");
         d3.csv("./data/car_data.csv", function (d) {
             return {
+                'id': d['id'],
                 'make': d['make'],
                 'fuel-type': d['fuel_type'],
                 'length': +d['length'],
@@ -67,72 +45,103 @@ Main.prototype = {
 
             self._data = data;
             self._data_selected = self._data.slice();
-            self.cluster();
             self.setupCharts();
 
         });
 
     },
 
-    cluster: function () {
+    setupCharts: function () {
+
+        self.c_map = smartZip(self.c_normal, self.c_blind);
+
+        $("#colorblindbutton").click(function () {
+            if ($("#colorblindbutton").hasClass("selected"))
+                $("#colorblindbutton").removeClass("selected");
+            else
+                $("#colorblindbutton").addClass("selected");
+
+            self.changeColor();
+        });
+
         var initial_array = toNestedArray(self._data);
         var reduced_tsne = reduceDimTSNE(initial_array);
         var clusters = clusterKMeans(initial_array);
-        var tsne_clusters = toObjects(reduced_tsne, clusters, self._data);
-        var c = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'red'];
-
-        var color = function (i) {
-            // var c = ['#66c2a5', '#fc8d62', '#8ad0cb'];
-            return c[i%3];
-        };
+        var tsne_clusters = toObjects(reduced_tsne, clusters);
 
         self._data.forEach(function (p, i) {
-            p['category'] = color(tsne_clusters[i]['category']);
+            p['category'] = self.color(tsne_clusters[i]['category']);
+            p['tsne-x'] = tsne_clusters[i].x;
+            p['tsne-y'] = tsne_clusters[i].y;
         });
-        drawScatterplot(tsne_clusters, color, c);
 
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_normal : self.c_blind;
+        initTsneScatter(self._data, self.color, colorScheme);
+        drawScatterplot(self._data, self.color, colorScheme);
 
+        self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
+        self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
+        addButtons(getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
     },
 
-    setupCharts: function () {
-        self._pcp = parallelCoordinatesChart2("pcp", self._data, self._colors, null, null);
-        // self._legend = legendChart("legend", self._data_selected, self._colors, self.callback_applyGroupFilter)
-        // self._donutMakes = donutChartGrouped("pie-groups", self._data_selected, "make",  self._colors, self._pcp.highlight_group);
-        // self._donutTotals = donutChartTotals("pie-totals", self._data_selected, self._colors);
-        // self._dataTable = dataTable("data-table", self._data, dimensions, self._colors, self._pcp.highlight_single)
-        self._dataTable = dataTable("data-table", self._data, null, self._colors);
+    color: function (i) {
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_normal : self.c_blind;
+        return colorScheme[i % 3];
     },
 
-    callback_applyBrushFilter: function (brushed_data) {
-        self._data_selected = brushed_data;
-        self.refreshCharts();
-    },
+    changeColor: function () {
+        self._data.forEach(function (d) {
+            d['category'] = self.c_map.get(d['category']);
+        });
 
-    refreshCharts: function () {
-        self._donutTotals.update(self._data_selected);
-        self._donutMakes.update(self._data_selected);
-        self._pcp.update(self._data_selected);
-        self._dataTable.update(self._data_selected);
+
+        changeToNewSchemeScatterPlot();
+        updateParallelCoordinatesChart(self._data);
+        var colorScheme = $("#colorblindbutton").hasClass("selected") ? self.c_normal : self.c_blind;
+
+        updateScatterplot(self._data, self.color, colorScheme);
     },
 
 
-    callback_applyGroupFilter: function (groupFilter) {
-        var hide = false;
-        var index = self._data_visible_groups.indexOf(groupFilter);
-        if (index == -1) {   // Index does not exist
-            hide = false;
-            // Add group as a visible group
-            self._data_visible_groups.push(groupFilter);
-        } else { // Index does exist
-            hide = true;
-            // Remove group as visible
-            self._data_visible_groups.splice(index, 1);
+    callback_updateCharts: function (selected_data, source_name) {
+        var colorScheme = self.colorBlindFlag ? self.c_blind : self.c_normal;
+        switch (source_name.toUpperCase()) {
+            case "PCP":
+                updateScatterplot(selected_data, self.color, colorScheme);
+                selectDataByIndex(selected_data);
+                break;
+            case "TSNE":
+                selectDataByIndex(selected_data);
+                break;
+            case "SPM":
+                updateScatterplot(selected_data, self.color, colorScheme);
+                updateParallelCoordinatesChart(selected_data);
+                break;
+            default:
+                updateScatterplot(selected_data, self.color, colorScheme);
+                updateParallelCoordinatesChart(selected_data);
+                selectDataByIndex(selected_data);
+
         }
-        self.refreshCharts();
-        return hide;
     }
+
+
 }
 
 function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function smartZip(arrayA, arrayB) {
+    var finalData = new Map();
+
+
+    arrayA.forEach(function (d, i) {
+        finalData.set(d, arrayB[i]);
+        finalData.set(arrayB[i], d);
+    });
+
+    console.log(finalData);
+
+    return finalData;
 }

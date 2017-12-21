@@ -58,8 +58,8 @@ rect.frame {
 div.tooltip {
     position: absolute;
     text-align: center;
-    width: 100px;
-    height: 40px;
+    width: 120px;
+    height: 45px;
     padding: 2px;
     font: 12px sans-serif;
     background: lightsteelblue;
@@ -85,7 +85,8 @@ div.tooltip {
 text.label {
     stroke: black;
     fill: black;
-    font-weight: 800;
+    font-family: sans-serif;
+    font-size: 10px;
 }
 
 div#vis,
@@ -103,4 +104,40 @@ ul {
 li {
     display: inline;
     padding: 20px;
+}
+
+.button {
+    background-color: #007bff; /* Green */
+    border: 2px solid white;
+    opacity: 1;
+    color: white;
+    padding: 16px 28px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 11px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.1s; /* Safari */
+    transition-duration: 0.1s;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    border: 2px solid #007bff;
+}
+
+.selected {
+    background-color: #007bff66;
+}
+
+#plotSVG {
+    margin: auto;
+    display: block;
+}
+
+svg#vis {
+    display: block;
+    margin: auto;
 }
