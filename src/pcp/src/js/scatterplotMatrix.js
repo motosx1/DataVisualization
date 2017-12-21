@@ -154,11 +154,11 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
         .append("svg")
 		.attr("id", "plotSVG")
         .attr("width", distanceToBottom + padding * 3)
-        .attr("height", distanceToBottom + padding)
+        .attr("height", distanceToBottom + padding + 50)
         .attr("transform", "translate(" + padding + ", " + padding / 2 + ")");
 
 
-	var xAxes = svg.selectAll("xAxis")
+	svg.selectAll("xAxis")
 				.data(featureNames)
 				.enter()
 					.append("g")
@@ -167,9 +167,9 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 					.each(function(d) { scaleBottom.domain(domains[d]); d3.select(this).call(bottomAxis.ticks(3).tickFormat(d3.formatPrefix(".0", 1e2))); })
 				.append("text")
 					.attr("class", "label")
-					.attr("x", padding + baseLeftOffset)
-					.attr("y", 20)
-					.style("text-anchor", "end")
+					.attr("x", padding)
+					.attr("y", 30)
+					.style("text-anchor", "start")
 					.text(function(d) { return d.toUpperCase(); } );
 
 	svg.selectAll("yAxis")
@@ -184,7 +184,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 			.attr("x", -15)
 			.attr("y", -baseLeftOffset)
 			.attr("transform", "rotate(-90)")
-			.style("text-anchor", "end")
+			.style("text-anchor", "center")
 			.text(function(d) { return d.toUpperCase(); } );
 
 	/* Define a Curry-like function */

@@ -1,8 +1,8 @@
 var margin = { top: 50, right: 0, bottom: 100, left: 30 };
-var colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"]; // alternatively colorbrewer.YlGnBu[9]
+var colors = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac']; // alternatively colorbrewer.YlGnBu[9]
 
 
-window.drawHeatmap = function(data, featureNames, bucketNumber) {
+window.drawHeatmap = function(data, featureNames) {
     var chart = d3.select('#headingFive');
     var targetWidth = chart.node().getBoundingClientRect().width - margin.left - margin.right;
     var sqSize = Math.floor(targetWidth / (3 * featureNames.length));
@@ -12,7 +12,8 @@ window.drawHeatmap = function(data, featureNames, bucketNumber) {
     var svg = d3
         .select("#corr-heatmap")
         .append("svg")
-            .attr("width", targetWidth + margin.left + margin.right)
+            .attr("id", "g-heat-map-svg")
+            .attr("width", (sqSize * featureNames.length * 2) + margin.left + margin.right)
             .attr("height", targetHeight + margin.top + margin.bottom)
         .append("g")
             .attr("id", "g-heat-map")
@@ -38,22 +39,23 @@ window.drawHeatmap = function(data, featureNames, bucketNumber) {
         .style("text-anchor", "end")
         .attr("transform", "translate(" + (3 * sqSize - 5) + "," + margin.top +")");
 
-    // This is temporary, i.e. the price column should be replaced with the correlation column
-    var correlationColumnName = 'price';
-
     var matMax = d3.max(data, function(d, i) {
         return d[i];
     });
 
+    var matMin = d3.min(data, function(d, i) {
+        return d[i];
+    });
+
+    console.log("Max and min " + matMax + ", " + matMin);
+
     var colorScale = d3
             .scaleQuantile()
-            .domain([0, bucketNumber - 1, matMax])
+            .domain([-1, 1])
             .range(colors);
 
     for (var i = 0; i < featureNames.length; ++i)
-        for (var j = 0; j <= i; ++j) {
-
-
+        for (var j = 0; j <= i; ++j)
             svg
                 .append("rect")
                 .attr("class", "correlationSquare")
@@ -61,36 +63,39 @@ window.drawHeatmap = function(data, featureNames, bucketNumber) {
                 .attr("y", i * sqSize)
                 .attr("rx", 4)
                 .attr("ry", 4)
-                // .attr("class", "hour bordered")
                 .attr("width", sqSize)
                 .attr("height", sqSize)
                 .style("fill", colorScale(data[i][j]))
                 .attr("transform", "translate(" + (sqSize * 3) + "," + 0 +")")
                 .append("title").text(data[i][j]);
-        }
+
 
     var cards = svg
         .selectAll(".correlationSquare");
 
     cards.exit().remove();
 
-    var legend = svg.selectAll(".legend")
-        .data([0].concat(colorScale.quantiles()), function(d) { return d; });
+    var legend = svg
+        .selectAll(".legend")
+        .data([0].concat(colorScale.quantiles()), function(d) { return d; })
+        .enter()
+        .append("g")
+        .attr("class", "legend");
 
-    legend.enter().append("g")
-            .attr("class", "legend")
+    legend
         .append("rect")
             .attr("x", function(d, i) { return legendElementWidth * i; })
-            .attr("y", 0)
+            .attr("y", targetHeight)
             .attr("width", legendElementWidth)
             .attr("height", sqSize / 2)
             .style("fill", function(d, i) { return colors[i]; });
 
-    legend.append("text")
-        .attr("class", "mono")
-        .text(function(d) { return "≥ " + Math.round(d); })
-        .attr("x", function(d, i) { return legendElementWidth * i; })
-        .attr("y", targetHeight + sqSize);
+    legend
+        .append("text")
+            .attr("class", "heat-font")
+            .text(function(d) { return "≥ " + d3.format(".3g")(d); })
+            .attr("x", function(d, i) { return legendElementWidth * i; })
+            .attr("y", targetHeight + sqSize);
 
     legend.exit().remove();
 };

@@ -65,11 +65,13 @@ Main.prototype = {
         });
 
         $("#zoom-in-tsne").click(function () {
-            if ($("#zoom-in-tsne").hasClass("selected")) {
-                $("#zoom-in-tsne").removeClass("selected");
+            if ($("#zoom-in-tsne").hasClass("clicked")) {
+                $("#zoom-in-tsne").removeClass("clicked");
+                $("#zoom-in-tsne").text("Zoom In Brush");
                 changeBrush(false);
             } else {
-                $("#zoom-in-tsne").addClass("selected");
+                $("#zoom-in-tsne").addClass("clicked");
+                $("#zoom-in-tsne").text("Selection Brush");
                 changeBrush(true);
             }
 
@@ -94,23 +96,9 @@ Main.prototype = {
 
         /* Get the feature names */
         var names = getFeatureNames(self._data, ['tsne-x', 'tsne-y']);
-
         self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, names);
         addButtons(names);
-
-        /* Generate some random numbers */
-        var heatmapMatrix = new Array(names.length);
-
-        for (var i = 0; i < names.length; ++i) {
-            heatmapMatrix[i] = new Array(names.length);
-
-            for (var j = 0; j < names.length; ++j)
-                heatmapMatrix[i][j]  = Math.floor(Math.random() * 100);
-        }
-
-        console.log(heatmapMatrix);
-
-        drawHeatmap(heatmapMatrix, names, 9);
+        drawHeatmap(computeCorrelationMatrix(self._data, names), names);
     },
 
     color: function (i) {
@@ -174,4 +162,27 @@ function smartZip(arrayA, arrayB) {
     console.log(finalData);
 
     return finalData;
+}
+
+function computeCorrelationMatrix(data, names) {
+    var heatmapMatrix = new Array(names.length);
+    var colArray = [];
+
+    for (var i = 0; i < names.length; ++i)
+        colArray.push(data.map(function (t) { return t[names[i]]; }));
+
+    console.log("Col Array: ");
+    console.log(colArray);
+
+
+    for (var i = 0; i < names.length; ++i) {
+        heatmapMatrix[i] = new Array(names.length);
+
+        for (var j = 0; j < names.length; ++j)
+            heatmapMatrix[i][j] =  getPearsonCorrelation(colArray[i], colArray[j]);
+    }
+
+    console.log(heatmapMatrix);
+
+    return heatmapMatrix;
 }
