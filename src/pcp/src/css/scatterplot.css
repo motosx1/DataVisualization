@@ -137,7 +137,8 @@ li {
     display: block;
 }
 
-svg#vis {
+svg#vis,
+g#g-heat-map{
     display: block;
     margin: auto;
 }

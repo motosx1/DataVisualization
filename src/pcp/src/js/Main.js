@@ -64,6 +64,17 @@ Main.prototype = {
             self.changeColor();
         });
 
+        $("#zoom-in-tsne").click(function () {
+            if ($("#zoom-in-tsne").hasClass("selected")) {
+                $("#zoom-in-tsne").removeClass("selected");
+                changeBrush(false);
+            } else {
+                $("#zoom-in-tsne").addClass("selected");
+                changeBrush(true);
+            }
+
+        });
+
         var initial_array = toNestedArray(self._data);
         var reduced_tsne = reduceDimTSNE(initial_array);
         var clusters = clusterKMeans(initial_array);
@@ -80,8 +91,26 @@ Main.prototype = {
         drawScatterplot(self._data, self.color, colorScheme);
 
         self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
-        self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
-        addButtons(getFeatureNames(self._data, ['tsne-x', 'tsne-y']));
+
+        /* Get the feature names */
+        var names = getFeatureNames(self._data, ['tsne-x', 'tsne-y']);
+
+        self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, names);
+        addButtons(names);
+
+        /* Generate some random numbers */
+        var heatmapMatrix = new Array(names.length);
+
+        for (var i = 0; i < names.length; ++i) {
+            heatmapMatrix[i] = new Array(names.length);
+
+            for (var j = 0; j < names.length; ++j)
+                heatmapMatrix[i][j]  = Math.floor(Math.random() * 100);
+        }
+
+        console.log(heatmapMatrix);
+
+        drawHeatmap(heatmapMatrix, names, 9);
     },
 
     color: function (i) {
@@ -112,6 +141,7 @@ Main.prototype = {
                 break;
             case "TSNE":
                 selectDataByIndex(selected_data);
+                updateParallelCoordinatesChart(selected_data);
                 break;
             case "SPM":
                 updateScatterplot(selected_data, self.color, colorScheme);
