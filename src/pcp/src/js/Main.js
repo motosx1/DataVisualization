@@ -94,10 +94,16 @@ Main.prototype = {
 
         self._pcp = parallelCoordinatesChart("pcp", self._data, self.callback_updateCharts);
 
-        /* Get the feature names */
+        /* Get the feature names, and whilst excluding the columns added for the t-sne plot */
         var names = getFeatureNames(self._data, ['tsne-x', 'tsne-y']);
+
+        /* Draw the scatterplot matrix */
         self._scatterPlot = drawScatterplotMatrix(self._data, self.callback_updateCharts, names);
+
+        /* Add the buttons for selecting and deselecting features for Scatterplot Matrix plotting */
         addButtons(names);
+
+        /* Draw the heatmap */
         drawHeatmap(computeCorrelationMatrix(self._data, names), names);
     },
 

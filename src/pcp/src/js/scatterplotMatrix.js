@@ -35,6 +35,13 @@ var baseLeftOffset = 40;
 
 var updateCallback;
 
+/**
+ * For each of the columns, bar those which are excluded, compute the domains of each feature, the names, and the total number of features
+ *
+ * @param data the data to be analyzed
+ * @param excludedFeatures the excluded features
+ * @returns {[null,null,null]} the domains, the feature names, and the feature number
+ */
 function getDomainAndFeatureNr(data, excludedFeatures) {
 
 	/* Initiate a domain variable */
@@ -53,10 +60,16 @@ function getDomainAndFeatureNr(data, excludedFeatures) {
 	return [domain, featureNames, featureNumber];
 }
 
+/**
+ * Rescales certain elements of the Scatterplot Matrix based on the number of selected features
+ *
+ * @param total
+ */
 function rescaleCoords(total) {
     var chart = d3.select('#headingFour');
     var targetWidth = chart.node().getBoundingClientRect().width;
 
+    /* Compute the size of a cell used for plotting a scatterplot */
     scatterPlotSize = targetWidth / total - padding;
 
     /* Create a template for the left axis */
@@ -74,6 +87,15 @@ function rescaleCoords(total) {
         .ticks(3);
 }
 
+
+/**
+ * Computes the histograms of a for the selected features of a dataset
+ *
+ * @param data the dataset
+ * @param featureNames the names of the features
+ * @param binNumber the number of bins
+ * @returns {Array} the array of generated histograms
+ */
 function createBins(data, featureNames, binNumber) {
 
 	var bins = [];
@@ -106,6 +128,14 @@ function createBins(data, featureNames, binNumber) {
 	return bins;
 }
 
+/**
+ * Draw the Scatterplot Matrix
+ *
+ * @param data the data to be plotted
+ * @param callback the callback method for updating the other plots upon brush selection
+ * @param selectedFeatures the selected features to be plotted
+ * @param excludedFeatures the features which should be excluded from plotting
+ */
 window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures = [], excludedFeatures = []) {
 	/* remove what was previously in this SVG */
 	d3.select("#plotSVG").remove();
@@ -158,6 +188,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
         .attr("transform", "translate(" + padding + ", " + padding / 2 + ")");
 
 
+    /* Create the X axis along with its labels */
 	svg.selectAll("xAxis")
 				.data(featureNames)
 				.enter()
@@ -172,6 +203,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 					.style("text-anchor", "start")
 					.text(function(d) { return d.toUpperCase(); } );
 
+    /* Create the Y axis along with its labels */
 	svg.selectAll("yAxis")
         .data(featureNames)
         .enter()
@@ -205,14 +237,7 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
 				.attr("transform", function(d) { return "translate(" + (d.i * scatterPlotSize + baseLeftOffset) + ", " + ((featureNumber - d.j - 1) * scatterPlotSize + 0.5) + ")"; })
 				.each(curryPlot);
 
-	/* Add a label to the cells found on the secondary diagonal of the scatter plot matrix */
-	// cells.filter(function(d) { return d.i === d.j; })
-	// 	.append("text")
-	// 	.attr("x", padding)
-	// 	.attr("y", padding)
-	// 	.attr("dy", ".71em")
-	// 	.text(function(d) { return d.iName; });
-
+	/* Appy the brush object on all scatterplots, exclude the histograms */
 	cells
 		.filter(function (t) { return t.i !== t.j; })
 		.call(brush);
@@ -220,30 +245,33 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
     /* The brushCell variable will hold the cell currently selected by the brush */
     var brushCell;
 
+    /* Callback method, called when the brush is initially requested (on first click) */
     function brushStart(p) {
         if (brushCell !== this) {
             d3.select(brushCell).call(brush.move, null);
             brushCell = this;
-            //brush.move(d3.select(brushCell), null);
 
+			/* Adjust the scale to that of the current plot */
             scaleBottom.domain(domains[p.iName]);
             scaleLeft.domain(domains[p.jName]);
         }
     }
 
+    /* Callback method called brush move */
     function brushMove(p) {
+    	/* Get the selection */
         var e = d3.brushSelection(this);
 
-        ////console.log("" + e);
-        ////console.log(p.iName + " " + p.jName);
-
+        /* If selection is null, remove the hidden class from all .circle elements */
         if (!e) {
             svg.selectAll(".circle").classed("hidden", false);
 
+            /* We have an empty selection, so the filtering will produce no instances */
             updateCallback([], "SPM");
         } else {
         	var returnedData = new Set();
 
+        	/* Get all the unique instances which fall in the area defined by the brush selection */
             svg.selectAll(".circle").classed("hidden", function (d) {
             	var res = e[0][0] > scaleBottom(d[p.iName]) || scaleBottom(d[p.iName]) > e[1][0] ||
 				          e[0][1] > scaleLeft(d[p.jName]) || scaleLeft(d[p.jName]) > e[1][1];
@@ -253,12 +281,13 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
                 return res;
             });
 
+            /* Request that the plots be updated relative to the current selection */
             updateCallback(Array.from(returnedData), "SPM");
         }
 
     }
 
-    // If the brush is empty, select all circles.
+    /* If the brush is empty, select all the elements of circle class */
     function brushEnd() {
         if (d3.event.selection === null) {
             svg.selectAll(".hidden").classed("hidden", false);
@@ -266,17 +295,15 @@ window.drawScatterplotMatrix = function(data, callback = null, selectedFeatures 
         }
     }
 
-}
+};
 
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
+/**
+ * Compute the Cartesian product of two arrays
+ *
+ * @param featureSetA the first array
+ * @param featureSetB the second array
+ * @returns {Array} the Cartesian product of the two arrays
+ */
 function cartesianProduct(featureSetA, featureSetB) {
 	var collection = [];
 
@@ -297,11 +324,21 @@ function cartesianProduct(featureSetA, featureSetB) {
 }
 
 
+/**
+ * Set up a cell and compute the instances within the given cell
+ *
+ * @param caller the calling element
+ * @param domains all the feature domains
+ * @param data the data conatining the instances to be plotted
+ * @param p
+ * @param bins the number of bins (in case it will be a histogram)
+ */
 function plotCellAndPoints(caller, domains, data, p, bins) {
     var cell = d3.select(caller);
 
     ////console.log(cell);
 
+	/* Create the rectangle which will contain the plot */
     cell.append("rect")
         .attr("class", "frame")
         .attr("x", padding / 2)
@@ -309,9 +346,11 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
         .attr("height", scatterPlotSize - padding)
         .attr("width", scatterPlotSize - padding);
 
+    /* Set up the scales of the axes */
     scaleBottom.domain(domains[p.iName]);
     scaleLeft.domain(domains[p.jName]);
 
+    /* If not histogram plot, then add all the points, and fill in with the cluster color */
     if (p.i !== p.j)
 		cell//.filter(function (d) { return d.i !== d.j; })
 			.selectAll("circle")
@@ -367,6 +406,13 @@ function plotCellAndPoints(caller, domains, data, p, bins) {
 
 }
 
+/**
+ * Computes the intersection of two arrays/sets
+ *
+ * @param setA the first set
+ * @param setB the second set
+ * @returns {Array} the intersection of the two sets
+ */
 function getCommonSet(setA, setB) {
 	var finalSet = [];
 
@@ -387,6 +433,11 @@ function getCommonSet(setA, setB) {
 	return finalSet;
 }
 
+/**
+ * Callback method when a feature is selected/deselected for plotting
+ *
+ * @param element
+ */
 window.elementSelected = function(element) {
 	var value = element.getAttribute("value");
     var index = totalFeatures.indexOf(value);
@@ -409,6 +460,12 @@ window.elementSelected = function(element) {
 }
 
 
+/**
+ * Get the feature name from a given dataset, whilst excluding the string features
+ *
+ * @param data the data from which the feature names will be extracted
+ * @returns {Array} an array of the feature names
+ */
 window.getFeatureNames = function(data) {
 	var myKeys = d3.keys(data[0]);
 	var finalKeys = [];
@@ -429,6 +486,13 @@ window.getFeatureNames = function(data) {
 	return finalKeys;
 };
 
+/**
+ * Get the feature name from a given dataset, whilst excluding the string features and a set of features which should be exlcuded
+ *
+ * @param data the data from which the feature names will be extracted
+ * @param excluded the names of the features which should be excluded
+ * @returns {Array} an array of the feature names
+ */
 window.getFeatureNames = function(data, excluded) {
     var myKeys = d3.keys(data[0]);
     var finalKeys = [];
@@ -449,6 +513,11 @@ window.getFeatureNames = function(data, excluded) {
     return finalKeys;
 };
 
+/**
+ * Add the buttons for the feature selection action based on a set of given names
+ *
+ * @param featureNames the set of feature names which will be used for creating the buttons
+ */
 window.addButtons = function(featureNames) {
 
 	$("#featuresDiv").empty()
@@ -461,6 +530,11 @@ window.addButtons = function(featureNames) {
 
 };
 
+/**
+ * Method which is called when data is filtered, it will make sure to highlight which features are highlighted
+ *
+ * @param selectedData the data resulted as part of a filtering process
+ */
 window.selectDataByIndex = function(selectedData) {
 
 	var set = new Set();
@@ -480,6 +554,10 @@ window.selectDataByIndex = function(selectedData) {
     });
 };
 
+/**
+ * Method called when one switches between colorblind mode, and normal mode.
+ *
+ */
 window.changeToNewSchemeScatterPlot = function() {
     d3
         .select("#vis-scatter-matrix")
