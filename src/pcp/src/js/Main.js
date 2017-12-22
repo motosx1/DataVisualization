@@ -66,7 +66,7 @@ Main.prototype = {
 
         var initial_array = toNestedArray(self._data);
         var reduced_tsne = reduceDimTSNE(initial_array);
-        var clusters = clusterKMeans(reduced_tsne);
+        var clusters = clusterKMeans(initial_array);
         var tsne_clusters = toObjects(reduced_tsne, clusters);
 
         self._data.forEach(function (p, i) {
