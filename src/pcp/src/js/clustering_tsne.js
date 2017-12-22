@@ -44,7 +44,8 @@ function normalize(unnormalized_data) {
     for (i = 0; i < unnormalized_data.length; i++) {
         normalized_data.push([]);
         for (j = 0; j < unnormalized_data[i].length; j++) {
-            normalized_data[i].push((unnormalized_data[i][j] - min_max[j].min) / min_max[j].max);
+            normalized_data[i].push((unnormalized_data[i][j] - min_max[j].min) /
+                                    (min_max[j].max - min_max[j].min));
         }
     }
     return normalized_data;
