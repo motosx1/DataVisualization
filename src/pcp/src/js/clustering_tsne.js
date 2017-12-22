@@ -14,6 +14,11 @@ function toNestedArray(data) {
     return ret;
 }
 
+/* Normalizes the data into the range [0, 1].
+
+   @param unnormalized_data :: [[Double]], the original data
+   @return :: [[Double]], the normalized data
+   */
 function normalize(unnormalized_data) {
     min_max = [ {min:unnormalized_data[0][0], max:unnormalized_data[0][0]}
                    , {min:unnormalized_data[0][1], max:unnormalized_data[0][1]}
@@ -44,7 +49,8 @@ function normalize(unnormalized_data) {
     for (i = 0; i < unnormalized_data.length; i++) {
         normalized_data.push([]);
         for (j = 0; j < unnormalized_data[i].length; j++) {
-            normalized_data[i].push((unnormalized_data[i][j] - min_max[j].min) / min_max[j].max);
+            normalized_data[i].push((unnormalized_data[i][j] - min_max[j].min) /
+                                    (min_max[j].max - min_max[j].min));
         }
     }
     return normalized_data;
@@ -52,10 +58,10 @@ function normalize(unnormalized_data) {
 
 /* Clusters the data in the given amount of clusters.
 
-   @param data: [[Double]], containing the data
-   @param numblusters: Int, the number of clusters
-   @return [Int], containing the cluster assignments
-   */
+   @param data :: [[Double]], containing the data
+   @param numblusters :: Int, the number of clusters
+   @return :: [Int], containing the cluster assignments
+*/
 function clusterKMeans(data, numclusters) {
     var kmeans = new KMEANS();
     var clusters = kmeans.run(normalize(data), numclusters);
@@ -72,8 +78,8 @@ function clusterKMeans(data, numclusters) {
 
 /* Applies TSNE dimensionality reduction algorithm.
 
-   @param data: [[Double]], containing the data
-   @return [[Double]], containing the data with reduced dimensionality
+   @param data :: [[Double]], containing the data
+   @return :: [[Double]], containing the data with reduced dimensionality
    */
 function reduceDimTSNE(data) {
     var opt = {};
@@ -96,9 +102,9 @@ function reduceDimTSNE(data) {
 /* Zips the TSNE reduced data with the clusters and turns the result into a list of objects.
    zipWith (\xy, c -> {x:xy[0], y:xy[1], category:c})
 
-   @param tsne_array: [[Double]], containing output from TSNE
-   @param clusters: [Int], containing a list of cluster assignments
-   @return [{x:,y:,category:}], list of objects containing the coordinates and category of a point
+   @param tsne_array :: [[Double]], containing output from TSNE
+   @param clusters :: [Int], containing a list of cluster assignments
+   @return :: [{x:,y:,category:}], list of objects containing the coordinates and category of a point
    */
 function toObjects(tsne_array, clusters) {
     var objects = [];
