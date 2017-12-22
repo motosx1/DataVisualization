@@ -143,6 +143,10 @@ li {
     border: 2px solid #ff5600;
 }
 
+.correlationSquare:hover {
+    border: 1px solid #ff5600;
+}
+
 #plotSVG,
 svg#g-heat-map-svg,
 svg#vis,
@@ -155,4 +159,9 @@ text.heat-font {
     font-size: 9pt;
     font-family: Consolas, courier, serif;
     fill: #aaa;
+}
+
+div#tableDiv th {
+    /*padding: 30px 12px;*/
+    /*border: 30px 12px;*/
 }
