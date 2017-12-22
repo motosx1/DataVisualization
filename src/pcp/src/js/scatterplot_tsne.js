@@ -14,6 +14,12 @@ var xScale;
 var yScale;
 var svg;
 
+var idle;
+var idleTime = 350;
+
+var zoomBrush;
+var brush;
+
 function initTsneScatter(data, color_function, color_domain) {
     var chart = d3.select("#headingThree"),
         targetWidth = chart.node().getBoundingClientRect().width;
@@ -37,6 +43,18 @@ function initTsneScatter(data, color_function, color_domain) {
         return d['tsne-y'];
     });
 
+    zoomBrush = d3
+        .brush()
+        .on("end", brushZoomEnd);
+
+    brush = d3.brush()
+        .extent(function() {
+            return [[xScale.range()[0], yScale.range()[1]], [xScale.range()[1], yScale.range()[0]]]
+        })
+        .on("start", brushStart)
+        .on("brush", brushMove)
+        .on("end", brushEnd);
+
     xScale = d3.scaleLinear()
         .domain(xExtent).nice()
         .range([0, width]);
@@ -53,13 +71,8 @@ function initTsneScatter(data, color_function, color_domain) {
     var yAxis = d3.axisLeft()
         .scale(yScale);
 
-    var idle;
-    var idleTime = 350;
-    var brush = d3
-        .brush()
-        .on("end", brushEnd);
-
     svg.append("g").attr("class", "brush").call(brush);
+    // svg.append("g").attr("class", "brush").call(zoomBrush);
 
     svg.append("g")
         .attr("class", "x-axis-tsne")
@@ -110,7 +123,46 @@ function initTsneScatter(data, color_function, color_domain) {
         });
 
 
+
+    function brushStart() {
+        // xScale.domain(xExtent);
+        // yScale.domain(yExtent);
+    }
+
+    function brushMove(p) {
+        var e = d3.brushSelection(this);
+
+        if (!e) {
+            svg.selectAll(".dot").classed("hidden", false);
+
+            updateCallback([], "TSNE");
+        } else {
+            var returnedData = new Set();
+
+            svg.selectAll(".dot").classed("hidden", function (d) {
+                var res = e[0][0] > xScale(d['tsne-x']) || xScale(d['tsne-x']) > e[1][0] ||
+                          e[0][1] > yScale(d['tsne-y']) || yScale(d['tsne-y']) > e[1][1];
+                if (!res)
+                    returnedData.add(d);
+
+                return res;
+            });
+
+            updateCallback(Array.from(returnedData), "TSNE");
+        }
+
+    }
+
+    // If the brush is empty, select all circles.
     function brushEnd() {
+        if (d3.event.selection === null) {
+            svg.selectAll(".hidden").classed("hidden", false);
+            updateCallback(data, "TSNE");
+        }
+    }
+
+
+    function brushZoomEnd() {
         /* If the selection is null, and we have a double click, reset the scale, and implicitly the graph */
         if (!d3.event.selection) {
             if (!idle)
@@ -122,7 +174,7 @@ function initTsneScatter(data, color_function, color_domain) {
             /* Otherwise, adjust the scale such that it will not focus on the area encompassed by the brush drag */
             xScale.domain([d3.event.selection[0][0], d3.event.selection[1][0]].map(xScale.invert, xScale));
             yScale.domain([d3.event.selection[1][1], d3.event.selection[0][1]].map(yScale.invert, yScale));
-            svg.select(".brush").call(brush.move, null);
+            svg.select(".brush").call(zoomBrush.move, null);
         }
         /* Perform the zoom-in operation (or zoom-out in case of double click) */
         zoom();
@@ -196,4 +248,13 @@ function drawScatterplot(data, color_function, color_domain) {
                 .duration(transitionTime)
                 .attr("r", 4);
         });
+}
+
+
+function changeBrush(isZoomBrush) {
+    if (isZoomBrush)
+        svg.select(".brush").call(zoomBrush);
+    else
+        svg.select(".brush").call(brush);
+
 }

@@ -47,7 +47,9 @@
     <script src="src/js/ParallelCoordinatesPlot.js"></script>
     <script src="src/js/scatterplot_tsne.js"></script>
     <script src="src/js/clustering_tsne.js"></script>
+    <script src="src/js/heatmap.js"></script>
     <script src="src/js/scatterplotMatrix.js"></script>
+    <script src="lib/pearson-correlation.js"></script>
     <script src="src/js/Main.js"></script>
 
 </head>
@@ -97,6 +99,24 @@
                     </div>
                 </div>
                 <div class="card">
+                    <div class="card-header" role="tab" id="headingFour">
+                        <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseFour" aria-expanded="false"
+                               aria-controls="collapseFour">
+                                Scatterplot matrix
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingFour">
+                        <div class="card-block">
+                            <div id = "featuresDiv">
+                            </div>
+                            <div id="vis-scatter-matrix">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
                     <div class="card-header" role="tab" id="headingTwo">
                         <h5 class="mb-0">
                             <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false"
@@ -125,31 +145,23 @@
                             <div id="tsne-div">
 		                            <svg id="tsne"></svg>
                             </div>
+                            <button class="button" id="zoom-in-tsne">Zoom In Brush</button>
                         </div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header" role="tab" id="headingFour">
+                    <div class="card-header" role="tab" id="headingFive">
                         <h5 class="mb-0">
-                            <a class="collapsed" data-toggle="collapse" href="#collapseFour" aria-expanded="false"
-                               aria-controls="collapseFour">
-                                Scatterplot matrix
+                            <a class="collapsed" data-toggle="collapse" href="#collapseFive" aria-expanded="false"
+                               aria-controls="collapseFive">
+                                Correlation Heatmap
                             </a>
                         </h5>
                     </div>
-                    <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingFour">
+                    <div id="collapseFive" class="collapse" role="tabpanel" aria-labelledby="headingFive">
                         <div class="card-block">
-
-
-
-                            <div id = "featuresDiv">
+                            <div id="corr-heatmap">
                             </div>
-                            <div id="vis-scatter-matrix">
-                            </div>
-
-
-
-
                         </div>
                     </div>
                 </div>
